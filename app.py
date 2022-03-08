@@ -100,7 +100,10 @@ class GlobalWomAboard(db.Model):
     now_confirm = db.Column(db.BigInteger, comment='现有确诊')
     now_confirm_compare = db.Column(db.BigInteger, comment='较上日确诊')
     last_update_time = db.Column(db.DateTime, comment='上次更新时间')
-    global_wom_world_id = db.Column(db.Integer, db.ForeignKey('t_global_wom_world.id'), comment='外键到同一时间的全球汇总数据')
+    global_wom_world_id = db.Column(
+        db.Integer,
+        db.ForeignKey('t_global_wom_world.id'),
+        comment='外键到同一时间的全球汇总数据')
 
     def __repr__(self):
         return self.name
