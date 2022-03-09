@@ -2,7 +2,7 @@
 
 host = '127.0.0.1'
 port = 3306
-database_name = 'monitor_forecast'
+database_name = 'monitor_forecast_dev'
 username = 'root'
 password = '123456'
 

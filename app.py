@@ -5,7 +5,7 @@ from flask import redirect, url_for
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 
-from src import database_config, request_service
+from src import database_config, tencent_request_service, db_request_service
 
 pymysql.install_as_MySQLdb()
 
@@ -27,10 +27,28 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/hello', methods=['GET', 'POST'])
-def hello():
-    request_service.save_wom_world()
-    return 'hello'
+@app.route('/global/continent')
+def global_continent():
+    """
+    各州累计确诊分布(海外)
+    :return:
+    """
+    return db_request_service.get_global_continent(GlobalWomWorld, GlobalWomAboard)
+
+
+@app.route('/global/map')
+def global_map():
+    """
+    全球各国数据-map地图
+    :return:
+    """
+    return db_request_service.get_global_map(GlobalWomWorld, GlobalWomAboard)
+
+
+@app.route('/pull', methods=['GET', 'POST'])
+def pull():
+    tencent_request_service.save_global_data(db, GlobalWomWorld, GlobalWomAboard)
+    return 'save_global_wom_world'
 
 
 def app_init():
@@ -46,17 +64,17 @@ def app_init():
     return app
 
 
-def database_init(database):
-    database.drop_all()
-    database.create_all()
+# def database_init(database):
+#     database.drop_all()
+#     database.create_all()
 
 
 def get_app():
     return app
 
 
-def get_db():
-    return db
+# def get_db():
+#     return db
 
 
 """
@@ -64,7 +82,7 @@ def get_db():
 """
 
 
-class GlobalWomAWorld(db.Model):
+class GlobalWomWorld(db.Model):
     """
         全球疫情汇总数据模型
     """
@@ -81,6 +99,26 @@ class GlobalWomAWorld(db.Model):
     death_rate = db.Column(db.FLOAT, comment='死亡率')
     cure_rate = db.Column(db.FLOAT, comment='治愈率')
     last_update_time = db.Column(db.DateTime, comment='上次更新时间')
+
+    def __self_dict__(self):
+        """
+        返回所有属性的字典
+        :return:
+        """
+        return {
+            'id': self.id,
+            'now_confirm': self.now_confirm,
+            'now_confirm_add': self.now_confirm_add,
+            'confirm': self.confirm,
+            'confirm_add': self.confirm_add,
+            'heal': self.heal,
+            'heal_add': self.heal_add,
+            'dead': self.dead,
+            'dead_add': self.dead_add,
+            'death_rate': self.death_rate,
+            'cure_rate': self.cure_rate,
+            'last_update_time': self.last_update_time
+        }
 
 
 class GlobalWomAboard(db.Model):
@@ -100,17 +138,38 @@ class GlobalWomAboard(db.Model):
     now_confirm = db.Column(db.BigInteger, comment='现有确诊')
     now_confirm_compare = db.Column(db.BigInteger, comment='较上日确诊')
     last_update_time = db.Column(db.DateTime, comment='上次更新时间')
-    global_wom_world_id = db.Column(
-        db.Integer,
-        db.ForeignKey('t_global_wom_world.id'),
-        comment='外键到同一时间的全球汇总数据')
 
-    def __repr__(self):
-        return self.name
+    def __self_dict__(self):
+        """
+        返回所有属性的字典
+        :return:
+        """
+        return {
+            'id': self.id,
+            'continent': self.continent,
+            'name': self.name,
+            'confirm': self.confirm,
+            'confirm_add': self.confirm_add,
+            'dead': self.dead,
+            'dead_compare': self.dead_compare,
+            'heal': self.heal,
+            'heal_compare': self.heal_compare,
+            'now_confirm': self.now_confirm,
+            'now_confirm_compare': self.now_confirm_compare,
+            'last_update_time': self.last_update_time
+        }
+
+    # global_wom_world_id = db.Column(
+    #     db.Integer,
+    #     db.ForeignKey('t_global_wom_world.id'),
+    #     comment='外键到同一时间的全球汇总数据')
+
+    # def __repr__(self):
+    #     return [self.id, self.continent, self.name, self.confirm, self.confirm_add, self.dead, self.dead_compare, self.heal, self.heal_compare, self.now_confirm, self.now_confirm_compare, self.last_update_time]
 
 
 if __name__ == '__main__':
     app_init()
-    database_init(db)
+    # database_init(db)
 
     app.run(debug=True)

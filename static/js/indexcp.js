@@ -23,7 +23,7 @@ var china = function() {
     var option = {
         title: {
             show: false,
-            text: '饼图',
+            text: '南丁格尔玫瑰图',
             x: 'center'
         },
         color: ['#37a2da', '#9fe6b8', '#ffdb5c', '#ff9f7f', '#fb7293', '#8378ea', '#00d887'],
@@ -45,15 +45,45 @@ var china = function() {
     myChart.setOption(option);
     var count = [];
     $.ajax({
-        url: 'http://127.0.0.1:5000/global/continent',
+        url : 'https://api.inews.qq.com/newsqa/v1/automation/modules/list?modules=FAutoCountryConfirmAdd,WomWorld,WomAboard',
         type: 'get',
         // data: {},
         dataType: 'json',
-        success: function (data) {
-            data.forEach(x => count.push({
-                name: x['continent'],
-                value: x['confirm']
-            }))
+        success: function(data) {
+            var womWorld = data.data.WomAboard
+            var a = 0
+            var b = 0
+            var c = 0
+            var d = 0
+            var e = 0
+            var f = 0
+            for (var i = 0; i < womWorld.length; i++) {
+                if (womWorld[i].continent === "亚洲") {
+                    a += womWorld[i].confirm
+                }
+                if (womWorld[i].continent === '非洲') {
+                    b += womWorld[i].confirm
+                }
+                if (womWorld[i].continent === '欧洲') {
+                    c += womWorld[i].confirm
+                }
+                if (womWorld[i].continent === '北美洲') {
+                    d += womWorld[i].confirm
+                }
+                if (womWorld[i].continent === '南美洲') {
+                    e += womWorld[i].confirm
+                }
+                if (womWorld[i].continent === '大洋洲') {
+                    f += womWorld[i].confirm
+                }
+            }
+
+            count.push({ value: a, name: '亚洲' })
+            count.push({ value: b, name: '非洲' })
+            count.push({ value: c, name: '欧洲' })
+            count.push({ value: d, name: '北美洲' })
+            count.push({ value: e, name: '南美洲' })
+            count.push({ value: f, name: '大洋洲' })
 
             //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
             myChart.setOption({ //加载数据图表
