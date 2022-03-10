@@ -748,7 +748,7 @@ var china = function () {
         "Thailand": "泰国",
         "Haiti": "海地",
         "Iraq": "伊拉克",
-        "S?o Tomé and Principe": "圣多美和普林西比",
+        "Sao Tome and Principe": "圣多美和普林西比",
         "Sierra Leone": "塞拉利昂",
         "Georgia": "格鲁吉亚",
         "Denmark": "丹麦",
