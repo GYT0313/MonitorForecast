@@ -39,10 +39,7 @@ def get_global_map(GlobalWomWorld, GlobalWomAboard):
     全球各国数据-map地图
     :return:
     """
-    # 只取name和累计确诊人数, map中日本为'日本本土', 需要进行替换, 否则无法显示
-    df = pd.DataFrame(get_global_aboard(GlobalWomWorld, GlobalWomAboard))[['name', 'confirm']]
-    df['name'].replace('日本', '日本本土', inplace=True)
-    return df.to_json(orient='records')
+    return pd.DataFrame(get_global_aboard(GlobalWomWorld, GlobalWomAboard)).to_json(orient='records')
 
 
 def get_global_daily_list(GlobalDailyList):

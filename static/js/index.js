@@ -164,9 +164,7 @@ var china = function () {
 
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
-    var virus = [
-        ['continent', 'name', 'confirm', 'confirm_add', 'dead', 'heal', 'heal_compare', 'now_confirm', 'now_confirm_compare']
-    ]
+    var virus = []
     $.ajax({
         // 丁格尔玫瑰图
         url: 'http://127.0.0.1:5000/global/head',
@@ -722,7 +720,7 @@ var china = function () {
         "Austria": "奥地利",
         "Mozambique": "莫桑比克",
         "Uganda": "乌干达",
-        "Japan": "日本本土",
+        "Japan": "日本",
         "Niger": "尼日尔",
         "Brazil": "巴西",
         "Kuwait": "科威特",
@@ -842,13 +840,22 @@ var china = function () {
         tooltip: {
             trigger: 'item',
             formatter: function (params) {
-                var value = params.value + '';
-                return params.seriesName + '<br/>' + params.name + ' : ' + value + '人';
+                // var value = params.value + '';
+                // return params.seriesName + '<br/>' + params.name + ' : ' + params.data[2] + '人';
+                return "所在地: " + params.data.continent + "</br>" +
+                    "国家: " + params.data.name + "</br>" +
+                    "累计确诊: " + params.data.confirm + "</br>" +
+                    "较昨日新增确诊: " + params.data.confirm_add + "</br>" +
+                    "累计死亡: " + params.data.dead + "</br>" +
+                    "较昨日新增死亡: " + params.data.heal + "</br>" +
+                    "累计治愈: " + params.data.heal_compare + "</br>" +
+                    "现有确诊: " + params.data.now_confirm + "</br>" +
+                    "较昨日现有确诊: " + params.data.now_confirm_compare;
             }
         },
         visualMap: {
             min: 0,
-            max: 1000000,
+            max: 50000000,
             text: ['High', 'Low'],
             realtime: false,
             calculable: false,
@@ -876,7 +883,7 @@ var china = function () {
                 }
             },
             nameMap: nameMap,
-            // data: 
+            // data:
         }]
     };
     // 把配置和数据给实例对象
@@ -889,8 +896,22 @@ var china = function () {
         dataType: 'jsonp',
         success: function (data) {
             var res = data.data || "";
-            res = JSON.parse(res).chinaTotal.confirm;
-            virus.push({name: '中国', value: res})
+            // res = JSON.parse(res).chinaTotal.confirm;
+            res = JSON.parse(res).chinaTotal;
+            // virus_temp.push({name: '中国', value: res})
+            virus.push({
+                'continent': '亚洲',
+                'name': '中国',
+                'confirm': res.confirm,
+                'confirm_add': '',
+                'dead': res.dead,
+                'heal': res.heal,
+                'heal_compare': '',
+                'now_confirm': res.nowConfirm,
+                'now_confirm_compare': '',
+                // 用于visualMap筛选, 颜色显示
+                'value': res.confirm
+            })
             myChart.setOption({ //加载数据图表
                 series: [{
                     // 根据名字对应到相应的系列
@@ -907,8 +928,17 @@ var china = function () {
         success: function (data) {
             data.forEach(item => {
                 virus.push({
-                    name: item.name,
-                    value: item.confirm
+                    'continent': item.continent,
+                    'name': item.name,
+                    'confirm': item.confirm,
+                    'confirm_add': item.confirm_add,
+                    'dead': item.dead,
+                    'heal': item.heal,
+                    'heal_compare': item.heal_compare,
+                    'now_confirm': item.now_confirm,
+                    'now_confirm_compare': item.now_confirm_compare,
+                    // 用于visualMap筛选, 颜色显示
+                    'value': item.confirm
                 })
             })
 
