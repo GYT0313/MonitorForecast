@@ -1,11 +1,11 @@
 //中国疫情数据
-var china = function() {
+var china = function () {
     $.ajax({
         url: 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5',
         type: 'get',
         // data: {},
         dataType: 'jsonp',
-        success: function(data) {
+        success: function (data) {
             var res = data.data || "";
             res = JSON.parse(res).chinaTotal.confirm;
             return res
@@ -14,9 +14,8 @@ var china = function() {
 };
 
 
-
 // 1、各洲累计确诊分布（海外）
-(function() {
+(function () {
     //初识化ECharts
     var myChart = echarts.init(document.querySelector(".bar .chart"));
     //指定配置项和数据
@@ -65,65 +64,76 @@ var china = function() {
     })
 
     //图表跟随屏幕自适应
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         myChart.resize();
     })
 })();
 
 
 // 2、世界疫情确诊情况前十五
-(function() {
+(function () {
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.querySelector(".bar1 .chart"));
     option = {
         dataset: {
             source: [
-                ['Country', 'Confirmed']
+                ['continent', 'name', 'confirm', 'confirm_add', 'dead', 'heal', 'heal_compare', 'now_confirm', 'now_confirm_compare']
             ]
         },
         calculable: true,
         tooltip: {
             trigger: 'item',
-            formatter: '{a} <br/>{c} ({d}%)'
+            // formatter: '{a} <br/>{c} ({d}%)'
+            formatter: function (params) {
+                return "所在地: " + params.data[0] + "</br>" +
+                    "国家: " + params.data[1] + "</br>" +
+                    "累计确诊: " + params.data[2] + "</br>" +
+                    "较昨日新增确诊: " + params.data[3] + "</br>" +
+                    "累计死亡: " + params.data[4] + "</br>" +
+                    "较昨日新增死亡: " + params.data[5] + "</br>" +
+                    "累计治愈: " + params.data[6] + "</br>" +
+                    "现有确诊: " + params.data[7] + "</br>" +
+                    "较昨日现有确诊: " + params.data[8];
+
+            }
         },
         series: [{
-                name: '确诊人数',
-                type: 'pie',
-                clockWise: false,
-                radius: [30, 460],
-                center: ['73%', '80%'],
-                roseType: 'area',
-                encode: {
-                    itemName: 'Country',
-                    value: 'Confirmed'
-                },
-                itemStyle: {
-                    normal: {
-                        color: function(params) {
-                            var colorList = [
-                                "#a71a4f", "#c71b1b", "#d93824", "#e7741b", "#dc9e31", "#d2b130", "#8cc13f", "#53b440", "#48af54", "#479c7f", "#48a698", "#57868c"
-                            ];
-                            return colorList[params.dataIndex]
+            name: '累计确诊',
+            type: 'pie',
+            clockWise: false,
+            radius: [30, 460],
+            center: ['73%', '80%'],
+            roseType: 'area',
+            // encode: {
+            //     itemName: 'name',
+            //     value: 'confirm'
+            // },
+            itemStyle: {
+                normal: {
+                    color: function (params) {
+                        var colorList = [
+                            "#a71a4f", "#c71b1b", "#d93824", "#e7741b", "#dc9e31", "#d2b130", "#8cc13f", "#53b440", "#48af54", "#479c7f", "#48a698", "#57868c"
+                        ];
+                        return colorList[params.dataIndex]
+                    },
+                    label: {
+                        position: 'inside',
+                        textStyle: {
+                            fontWeight: 'bold',
+                            fontFamily: 'Microsoft YaHei',
+                            color: '#FAFAFA',
+                            fontSize: 10
                         },
-                        label: {
-                            position: 'inside',
-                            textStyle: {
-                                fontWeight: 'bold',
-                                fontFamily: 'Microsoft YaHei',
-                                color: '#FAFAFA',
-                                fontSize: 10
-                            },
-                            //formatter:'{b} \n{@Confirmed}例 \n死亡{@Dead}',//注意这里大小写敏感哦
-                            formatter: function(params) {
-                                // console.log('参数列表', params)
-                                if (params.data[1] > 9000) { return params.data[0] } else { return ""; }
-                            },
+                        //注意这里大小写敏感
+                        formatter: function (params) {
+                            return params.data[1]
+                        },
 
-                        },
                     },
                 },
-
             },
+
+        },
             {
                 name: '透明圆圈',
                 type: 'pie',
@@ -133,7 +143,7 @@ var china = function() {
                     color: 'rgba(250, 250, 250, 0.3)',
                 },
                 data: [
-                    { value: 5, name: '' }
+                    {value: 5, name: ''}
                 ]
             },
             {
@@ -145,7 +155,7 @@ var china = function() {
                     color: 'rgba(250, 250, 250, 0.3)',
                 },
                 data: [
-                    { value: 5, name: '' }
+                    {value: 5, name: ''}
                 ]
             }
         ]
@@ -155,20 +165,19 @@ var china = function() {
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
     var virus = [
-        ['Country', 'Confirmed']
+        ['continent', 'name', 'confirm', 'confirm_add', 'dead', 'heal', 'heal_compare', 'now_confirm', 'now_confirm_compare']
     ]
     $.ajax({
         // 丁格尔玫瑰图
-        url: 'https://api.inews.qq.com/newsqa/v1/automation/modules/list?modules=FAutoCountryConfirmAdd,WomWorld,WomAboard',
+        url: 'http://127.0.0.1:5000/global/head',
         type: 'get',
         // data: {},
         dataType: 'json',
-        success: function(data) {
-            var num = data.data.WomAboard
-            for (var i = 0; i < 15; i++) {
-                virus.push([num[i].name, num[i].confirm])
-            }
-            // myChart.hideLoading()
+        success: function (data) {
+            data.forEach(item => {
+                virus.push([item.continent, item.name, item.confirm, item.confirm_add, item.dead, item.heal,
+                    item.heal_compare, item.now_confirm, item.now_confirm_compare])
+            })
             //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
             myChart.setOption({ //加载数据图表
                 dataset: {
@@ -178,14 +187,14 @@ var china = function() {
         }
     })
 
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", function () {
         myChart.resize();
     });
 })();
 
 
 // 3、全球疫情趋势（海外）
-(function() {
+(function () {
     var myChart = echarts.init(document.querySelector('.line .chart'))
     var option = {
         tooltip: {
@@ -236,7 +245,7 @@ var china = function() {
         yAxis: [{
             type: 'value',
             //隐藏坐标轴刻度
-            axisTick: { show: false },
+            axisTick: {show: false},
             //标注y轴线样式
             axisLine: {
                 lineStyle: {
@@ -259,51 +268,51 @@ var china = function() {
         }],
         //主题样式设计
         series: [{
-                name: '累计确诊',
-                type: 'line',
-                // stack: '总量', //数据堆叠
-                // data: [220, 182, 191, 234, 290, 330, 310],
-                //线圆滑
-                smooth: true,
-                // 单独修改线的样式
-                lineStyle: {
-                    color: "#0184d5",
-                    width: 2
-                },
-                // 填充区域
-                areaStyle: {
-                    // 渐变色
-                    color: new echarts.graphic.LinearGradient(
-                        0,
-                        0,
-                        0,
-                        1,
-                        [{
-                                offset: 0,
-                                color: "rgba(1, 132, 213, 0.4)" // 渐变色的起始颜色
-                            },
-                            {
-                                offset: 0.8,
-                                color: "rgba(1, 132, 213, 0.1)" // 渐变线的结束颜色
-                            }
-                        ],
-                        false
-                    ),
-                    shadowColor: "rgba(0, 0, 0, 0.1)" //阴影颜色
-                },
-                // 设置拐点 小圆点
-                symbol: "circle",
-                // 拐点大小
-                symbolSize: 8,
-                // 设置拐点颜色以及边框
-                itemStyle: {
-                    color: "#0184d5",
-                    borderColor: "rgba(221, 220, 107, .1)",
-                    borderWidth: 12
-                },
-                //开始不显示坐标圆点
-                showSymbol: false,
+            name: '累计确诊',
+            type: 'line',
+            // stack: '总量', //数据堆叠
+            // data: [220, 182, 191, 234, 290, 330, 310],
+            //线圆滑
+            smooth: true,
+            // 单独修改线的样式
+            lineStyle: {
+                color: "#0184d5",
+                width: 2
             },
+            // 填充区域
+            areaStyle: {
+                // 渐变色
+                color: new echarts.graphic.LinearGradient(
+                    0,
+                    0,
+                    0,
+                    1,
+                    [{
+                        offset: 0,
+                        color: "rgba(1, 132, 213, 0.4)" // 渐变色的起始颜色
+                    },
+                        {
+                            offset: 0.8,
+                            color: "rgba(1, 132, 213, 0.1)" // 渐变线的结束颜色
+                        }
+                    ],
+                    false
+                ),
+                shadowColor: "rgba(0, 0, 0, 0.1)" //阴影颜色
+            },
+            // 设置拐点 小圆点
+            symbol: "circle",
+            // 拐点大小
+            symbolSize: 8,
+            // 设置拐点颜色以及边框
+            itemStyle: {
+                color: "#0184d5",
+                borderColor: "rgba(221, 220, 107, .1)",
+                borderWidth: 12
+            },
+            //开始不显示坐标圆点
+            showSymbol: false,
+        },
             {
                 // 开始不显示拐点， 鼠标经过显示
                 showSymbol: false,
@@ -312,7 +321,7 @@ var china = function() {
                 smooth: true,
                 lineStyle: {
                     normal: {
-                        color: "#00d887",
+                        color: "#37a2da",
                         width: 2
                     }
                 },
@@ -324,9 +333,9 @@ var china = function() {
                             0,
                             1,
                             [{
-                                    offset: 0,
-                                    color: "rgba(0, 216, 135, 0.4)"
-                                },
+                                offset: 0,
+                                color: "rgba(0, 216, 135, 0.4)"
+                            },
                                 {
                                     offset: 0.8,
                                     color: "rgba(0, 216, 135, 0.1)"
@@ -343,7 +352,199 @@ var china = function() {
                 symbolSize: 5,
                 // 设置拐点颜色以及边框
                 itemStyle: {
-                    color: "#00d887",
+                    color: "#37a2da",
+                    borderColor: "rgba(221, 220, 107, .1)",
+                    borderWidth: 12
+                },
+                // 开始不显示拐点， 鼠标经过显示
+                showSymbol: false,
+                // data: [120, 132, 101, 134, 90, 230, 210]
+                // stack: '总量',
+            },
+            {
+                // 开始不显示拐点， 鼠标经过显示
+                showSymbol: false,
+                name: "累计治愈",
+                type: "line",
+                smooth: true,
+                lineStyle: {
+                    normal: {
+                        color: "#ffdb5c",
+                        width: 2
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(
+                            0,
+                            0,
+                            0,
+                            1,
+                            [{
+                                offset: 0,
+                                color: "rgba(0, 216, 135, 0.4)"
+                            },
+                                {
+                                    offset: 0.8,
+                                    color: "rgba(0, 216, 135, 0.1)"
+                                }
+                            ],
+                            false
+                        ),
+                        shadowColor: "rgba(0, 0, 0, 0.1)"
+                    }
+                },
+                // 设置拐点 小圆点
+                symbol: "circle",
+                // 拐点大小
+                symbolSize: 5,
+                // 设置拐点颜色以及边框
+                itemStyle: {
+                    color: "#ffdb5c",
+                    borderColor: "rgba(221, 220, 107, .1)",
+                    borderWidth: 12
+                },
+                // 开始不显示拐点， 鼠标经过显示
+                showSymbol: false,
+                // data: [120, 132, 101, 134, 90, 230, 210]
+                // stack: '总量',
+            },
+            {
+                // 开始不显示拐点， 鼠标经过显示
+                showSymbol: false,
+                name: "较昨日新增",
+                type: "line",
+                smooth: true,
+                lineStyle: {
+                    normal: {
+                        color: "#ff9f7f",
+                        width: 2
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(
+                            0,
+                            0,
+                            0,
+                            1,
+                            [{
+                                offset: 0,
+                                color: "rgba(0, 216, 135, 0.4)"
+                            },
+                                {
+                                    offset: 0.8,
+                                    color: "rgba(0, 216, 135, 0.1)"
+                                }
+                            ],
+                            false
+                        ),
+                        shadowColor: "rgba(0, 0, 0, 0.1)"
+                    }
+                },
+                // 设置拐点 小圆点
+                symbol: "circle",
+                // 拐点大小
+                symbolSize: 5,
+                // 设置拐点颜色以及边框
+                itemStyle: {
+                    color: "#ff9f7f",
+                    borderColor: "rgba(221, 220, 107, .1)",
+                    borderWidth: 12
+                },
+                // 开始不显示拐点， 鼠标经过显示
+                showSymbol: false,
+                // data: [120, 132, 101, 134, 90, 230, 210]
+                // stack: '总量',
+            },
+            {
+                // 开始不显示拐点， 鼠标经过显示
+                showSymbol: false,
+                name: "死亡率%",
+                type: "line",
+                smooth: true,
+                lineStyle: {
+                    normal: {
+                        color: "#fb7293",
+                        width: 2
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(
+                            0,
+                            0,
+                            0,
+                            1,
+                            [{
+                                offset: 0,
+                                color: "rgba(0, 216, 135, 0.4)"
+                            },
+                                {
+                                    offset: 0.8,
+                                    color: "rgba(0, 216, 135, 0.1)"
+                                }
+                            ],
+                            false
+                        ),
+                        shadowColor: "rgba(0, 0, 0, 0.1)"
+                    }
+                },
+                // 设置拐点 小圆点
+                symbol: "circle",
+                // 拐点大小
+                symbolSize: 5,
+                // 设置拐点颜色以及边框
+                itemStyle: {
+                    color: "#fb7293",
+                    borderColor: "rgba(221, 220, 107, .1)",
+                    borderWidth: 12
+                },
+                // 开始不显示拐点， 鼠标经过显示
+                showSymbol: false,
+                // data: [120, 132, 101, 134, 90, 230, 210]
+                // stack: '总量',
+            },
+            {
+                // 开始不显示拐点， 鼠标经过显示
+                showSymbol: false,
+                name: "治愈率%",
+                type: "line",
+                smooth: true,
+                lineStyle: {
+                    normal: {
+                        color: "#8378ea",
+                        width: 2
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(
+                            0,
+                            0,
+                            0,
+                            1,
+                            [{
+                                offset: 0,
+                                color: "rgba(0, 216, 135, 0.4)"
+                            },
+                                {
+                                    offset: 0.8,
+                                    color: "rgba(0, 216, 135, 0.1)"
+                                }
+                            ],
+                            false
+                        ),
+                        shadowColor: "rgba(0, 0, 0, 0.1)"
+                    }
+                },
+                // 设置拐点 小圆点
+                symbol: "circle",
+                // 拐点大小
+                symbolSize: 5,
+                // 设置拐点颜色以及边框
+                itemStyle: {
+                    color: "#8378ea",
                     borderColor: "rgba(221, 220, 107, .1)",
                     borderWidth: 12
                 },
@@ -357,28 +558,44 @@ var china = function() {
     // 把配置和数据给实例对象
     myChart.setOption(option);
 
-    var count = []
-    var count1 = []
+    var confirmCount = []
+    var deadCount = []
+    var healCount = []
+    var newAddConfirmCount = []
+    var deadRateCount = []
+    var healRateCount = []
     var date = []
     //  全球疫情趋势（海外）
     $.ajax({
-        url: 'https://api.inews.qq.com/newsqa/v1/automation/modules/list?modules=FAutoGlobalStatis,FAutoContinentStatis,FAutoGlobalDailyList,FAutoCountryConfirmAdd',
+        url: 'http://127.0.0.1:5000//global/daily_list',
         type: 'get',
         // data: {},
         dataType: 'json',
-        success: function(data) {
-            var qushi = data.data.FAutoGlobalDailyList
-            for (var i = 0; i < qushi.length; i++) {
-                count.push(qushi[i].all.confirm)
-                count1.push(qushi[i].all.dead)
-                date.push(qushi[i].y + '-' + qushi[i].date)
-            }
-            // //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
+        success: function (data) {
+            data.forEach(item => {
+                confirmCount.push(item.confirm)
+                deadCount.push(item.dead)
+                healCount.push(item.heal)
+                newAddConfirmCount.push(item.new_add_confirm)
+                deadRateCount.push(item.dead_rate)
+                healRateCount.push(item.heal_rate)
+                date.push(item.date_time)
+            })
+
+            //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
             myChart.setOption({ //加载数据图表
                 series: [{
-                    data: count
+                    data: confirmCount
                 }, {
-                    data: count1
+                    data: deadCount
+                }, {
+                    data: healCount
+                }, {
+                    data: newAddConfirmCount
+                }, {
+                    data: deadRateCount
+                }, {
+                    data: healRateCount
                 }],
                 xAxis: [{
                     data: date
@@ -387,14 +604,14 @@ var china = function() {
         }
     })
 
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         myChart.resize()
     })
 })();
 
 
 // 4、全球疫情地图
-(function() {
+(function () {
     var myChart = echarts.init(document.querySelector('.map .chart'))
     var nameMap = {
         "Canada": "加拿大",
@@ -615,7 +832,7 @@ var china = function() {
     var option = {
         title: {
             text: '全球各国确诊情况',
-            // subtext: '累计确诊人数（截止至北京时间2020-06-09 08:30）',
+            // subtext: '累计确诊人数',
             left: 'center',
             textStyle: {
                 color: 'white'
@@ -624,7 +841,7 @@ var china = function() {
         },
         tooltip: {
             trigger: 'item',
-            formatter: function(params) {
+            formatter: function (params) {
                 var value = params.value + '';
                 return params.seriesName + '<br/>' + params.name + ' : ' + value + '人';
             }
@@ -670,10 +887,10 @@ var china = function() {
         type: 'get',
         // data: {},
         dataType: 'jsonp',
-        success: function(data) {
+        success: function (data) {
             var res = data.data || "";
             res = JSON.parse(res).chinaTotal.confirm;
-            virus.push({ name: '中国', value: res })
+            virus.push({name: '中国', value: res})
             myChart.setOption({ //加载数据图表
                 series: [{
                     // 根据名字对应到相应的系列
@@ -684,18 +901,17 @@ var china = function() {
     });
     $.ajax({
         // 全球疫情地图
-        url: 'https://api.inews.qq.com/newsqa/v1/automation/modules/list?modules=FAutoCountryConfirmAdd,WomWorld,WomAboard',
+        url: 'http://127.0.0.1:5000/global/map',
         type: 'get',
-        // data: {},
         dataType: 'json',
-        success: function(data) {
-            var num = data.data.WomAboard
-            var sum = 0
-            for (var i = 0; i < num.length; i++) {
-                virus.push({ name: num[i].name, value: num[i].confirm })
-                sum += num[i].confirm
-            }
-            // myChart.hideLoading()
+        success: function (data) {
+            data.forEach(item => {
+                virus.push({
+                    name: item.name,
+                    value: item.confirm
+                })
+            })
+
             //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
             myChart.setOption({ //加载数据图表
                 series: [{
@@ -705,7 +921,7 @@ var china = function() {
             })
         }
     })
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
         myChart.resize()
     })
 })();

@@ -45,9 +45,28 @@ def global_map():
     return db_request_service.get_global_map(GlobalWomWorld, GlobalWomAboard)
 
 
+@app.route('/global/daily_list')
+def global_daily_list():
+    """
+    全球每日疫情数据-疫情趋势图
+    :return:
+    """
+    return db_request_service.get_global_daily_list(GlobalDailyList)
+
+
+@app.route('/global/head')
+def global_head_fifteen():
+    """
+    各国确诊数前15
+    :return:
+    """
+    return db_request_service.get_global_head_fifteen(GlobalWomWorld, GlobalWomAboard)
+
+
 @app.route('/pull', methods=['GET', 'POST'])
 def pull():
     tencent_request_service.save_global_data(db, GlobalWomWorld, GlobalWomAboard)
+    tencent_request_service.save_global_daily_list(db, GlobalDailyList)
     return 'save_global_wom_world'
 
 
@@ -62,11 +81,6 @@ def app_init():
     print(database_config.DatabaseConfig.SQLALCHEMY_DATABASE_URI)
 
     return app
-
-
-# def database_init(database):
-#     database.drop_all()
-#     database.create_all()
 
 
 def get_app():
@@ -164,12 +178,41 @@ class GlobalWomAboard(db.Model):
     #     db.ForeignKey('t_global_wom_world.id'),
     #     comment='外键到同一时间的全球汇总数据')
 
-    # def __repr__(self):
-    #     return [self.id, self.continent, self.name, self.confirm, self.confirm_add, self.dead, self.dead_compare, self.heal, self.heal_compare, self.now_confirm, self.now_confirm_compare, self.last_update_time]
+
+class GlobalDailyList(db.Model):
+    """
+        全球疫情汇总数据模型
+    """
+    __tablename__ = 't_global_wom_daily_list'
+    id = db.Column(db.Integer, primary_key=True, comment='主键')
+    confirm = db.Column(db.BigInteger, comment='累计确诊')
+    dead = db.Column(db.BigInteger, comment='累计死亡')
+    heal = db.Column(db.BigInteger, comment='累计治愈')
+    new_add_confirm = db.Column(db.BigInteger, comment='较上日新增确诊')
+    dead_rate = db.Column(db.FLOAT, comment='死亡率')
+    heal_rate = db.Column(db.FLOAT, comment='治愈率')
+    date_time = db.Column(db.DateTime, comment='数据时间')
+
+    def __self_dict__(self):
+        """
+        返回所有属性的字典
+        :return:
+        """
+        return {
+            'id': self.id,
+            'confirm': self.confirm,
+            'dead': self.dead,
+            'heal': self.heal,
+            'new_add_confirm': self.new_add_confirm,
+            'dead_rate': self.dead_rate,
+            'heal_rate': self.heal_rate,
+            'date_time': self.date_time.date().__str__()
+        }
 
 
 if __name__ == '__main__':
     app_init()
-    # database_init(db)
+    # db.drop_all()
+    # db.create_all()
 
     app.run(debug=True)
