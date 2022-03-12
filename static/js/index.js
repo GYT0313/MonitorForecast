@@ -1,17 +1,16 @@
-//中国疫情数据
-var china = function () {
-    $.ajax({
-        url: 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5',
-        type: 'get',
-        // data: {},
-        dataType: 'jsonp',
-        success: function (data) {
-            var res = data.data || "";
-            res = JSON.parse(res).chinaTotal.confirm;
-            return res
-        }
-    })
-};
+// //中国疫情数据
+// var china = function () {
+//     $.ajax({
+//         url: 'http://127.0.0.1:5000/china/map',
+//         type: 'get',
+//         // data: {},
+//         dataType: 'jsonp',
+//         success: function (data) {
+//             console.log(data.confirm)
+//             return data.confirm
+//         }
+//     })
+// };
 
 
 // 1、各洲累计确诊分布（海外）
@@ -88,12 +87,13 @@ var china = function () {
                 return "所在地: " + params.data[0] + "</br>" +
                     "国家: " + params.data[1] + "</br>" +
                     "累计确诊: " + params.data[2] + "</br>" +
-                    "较昨日新增确诊: " + params.data[3] + "</br>" +
+                    "较昨日确诊: " + (params.data[3] > 0 ? '+' + params.data[3] : params.data[3]) + "</br>" +
                     "累计死亡: " + params.data[4] + "</br>" +
-                    "较昨日新增死亡: " + params.data[5] + "</br>" +
+                    "较昨日死亡: " + (params.data[5] > 0 ? '+' + params.data[5] : params.data[5]) + "</br>" +
                     "累计治愈: " + params.data[6] + "</br>" +
-                    "现有确诊: " + params.data[7] + "</br>" +
-                    "较昨日现有确诊: " + params.data[8];
+                    "较昨日治愈: " + (params.data[7] > 0 ? '+' + params.data[7] : params.data[7]) + "</br>" +
+                    "现有确诊: " + params.data[8] + "</br>" +
+                    "较昨日现有确诊: " + (params.data[9] > 0 ? '+' + params.data[9] : params.data[9]);
 
             }
         },
@@ -173,8 +173,8 @@ var china = function () {
         dataType: 'json',
         success: function (data) {
             data.forEach(item => {
-                virus.push([item.continent, item.name, item.confirm, item.confirm_add, item.dead, item.heal,
-                    item.heal_compare, item.now_confirm, item.now_confirm_compare])
+                virus.push([item.continent, item.name, item.confirm, item.confirm_add, item.dead, item.dead_compare,
+                    item.heal, item.heal_compare, item.now_confirm, item.now_confirm_compare])
             })
             //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
             myChart.setOption({ //加载数据图表
@@ -565,7 +565,7 @@ var china = function () {
     var date = []
     //  全球疫情趋势（海外）
     $.ajax({
-        url: 'http://127.0.0.1:5000//global/daily_list',
+        url: 'http://127.0.0.1:5000/global/daily',
         type: 'get',
         // data: {},
         dataType: 'json',
@@ -845,12 +845,13 @@ var china = function () {
                 return "所在地: " + params.data.continent + "</br>" +
                     "国家: " + params.data.name + "</br>" +
                     "累计确诊: " + params.data.confirm + "</br>" +
-                    "较昨日新增确诊: " + params.data.confirm_add + "</br>" +
+                    "较昨日确诊: " + (params.data.confirm_add > 0 ? '+' + params.data.confirm_add : params.data.confirm_add) + "</br>" +
                     "累计死亡: " + params.data.dead + "</br>" +
-                    "较昨日新增死亡: " + params.data.heal + "</br>" +
-                    "累计治愈: " + params.data.heal_compare + "</br>" +
+                    "较昨日死亡: " + (params.data.dead_compare > 0 ? '+' + params.data.dead_compare : params.data.dead_compare) + "</br>" +
+                    "累计治愈: " + params.data.heal + "</br>" +
+                    "较昨日治愈: " + (params.data.heal_compare > 0 ? '+' + params.data.heal_compare : params.data.heal_compare) + "</br>" +
                     "现有确诊: " + params.data.now_confirm + "</br>" +
-                    "较昨日现有确诊: " + params.data.now_confirm_compare;
+                    "较昨日现有确诊: " + (params.data.now_confirm_compare > 0 ? '+' + params.data.now_confirm_compare : params.data.now_confirm_compare);
             }
         },
         visualMap: {
@@ -890,27 +891,24 @@ var china = function () {
     myChart.setOption(option);
     var virus = []
     $.ajax({
-        url: 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5',
+        url: 'http://127.0.0.1:5000/china/map',
         type: 'get',
         // data: {},
-        dataType: 'jsonp',
+        dataType: 'json',
         success: function (data) {
-            var res = data.data || "";
-            // res = JSON.parse(res).chinaTotal.confirm;
-            res = JSON.parse(res).chinaTotal;
-            // virus_temp.push({name: '中国', value: res})
             virus.push({
-                'continent': '亚洲',
-                'name': '中国',
-                'confirm': res.confirm,
-                'confirm_add': '',
-                'dead': res.dead,
-                'heal': res.heal,
-                'heal_compare': '',
-                'now_confirm': res.nowConfirm,
-                'now_confirm_compare': '',
+                'continent': data.continent,
+                'name': data.name,
+                'confirm': data.confirm,
+                'confirm_add': data.confirm_add,
+                'dead': data.dead,
+                'dead_compare': data.dead_compare,
+                'heal': data.heal,
+                'heal_compare': data.heal_compare,
+                'now_confirm': data.now_confirm,
+                'now_confirm_compare': data.now_confirm_compare,
                 // 用于visualMap筛选, 颜色显示
-                'value': res.confirm
+                'value': data.confirm
             })
             myChart.setOption({ //加载数据图表
                 series: [{
@@ -933,6 +931,7 @@ var china = function () {
                     'confirm': item.confirm,
                     'confirm_add': item.confirm_add,
                     'dead': item.dead,
+                    'dead_compare': item.dead_compare,
                     'heal': item.heal,
                     'heal_compare': item.heal_compare,
                     'now_confirm': item.now_confirm,
