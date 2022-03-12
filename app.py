@@ -61,7 +61,8 @@ def global_head_fifteen():
     各国确诊数前15
     :return:
     """
-    return db_request_service.get_global_head_fifteen(GlobalWomWorld, GlobalWomAboard)
+    return db_request_service.get_global_head_fifteen(
+        GlobalWomWorld, GlobalWomAboard)
 
 
 @app.route('/china/map')
