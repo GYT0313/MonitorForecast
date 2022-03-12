@@ -33,7 +33,8 @@ def global_continent():
     各州累计确诊分布(海外)
     :return:
     """
-    return db_request_service.get_global_continent(GlobalWomWorld, GlobalWomAboard)
+    return db_request_service.get_global_continent(
+        GlobalWomWorld, GlobalWomAboard)
 
 
 @app.route('/global/map')
@@ -69,16 +70,23 @@ def china_map():
     国内数据
     :return:
     """
-    return db_request_service.get_china_total_and_daily(ChinaTotal, ChinaCompareDaily)
+    return db_request_service.get_china_total_and_daily(
+        ChinaTotal, ChinaCompareDaily)
 
 
 @app.route('/pull', methods=['GET', 'POST'])
 def pull():
-    tencent_request_service.save_global_data(db=db, GlobalWomWorld=GlobalWomWorld, GlobalWomAboard=GlobalWomAboard,
-                                             GlobalDaily=GlobalDaily)
-    tencent_request_service.save_china(db, ChinaTotal=ChinaTotal, ChinaCompareDaily=ChinaCompareDaily,
-                                       ChinaProvince=ChinaProvince,
-                                       ChinaCity=ChinaCity)
+    tencent_request_service.save_global_data(
+        db=db,
+        GlobalWomWorld=GlobalWomWorld,
+        GlobalWomAboard=GlobalWomAboard,
+        GlobalDaily=GlobalDaily)
+    tencent_request_service.save_china(
+        db,
+        ChinaTotal=ChinaTotal,
+        ChinaCompareDaily=ChinaCompareDaily,
+        ChinaProvince=ChinaProvince,
+        ChinaCity=ChinaCity)
     return 'save_data'
 
 
