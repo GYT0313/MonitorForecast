@@ -13,7 +13,7 @@
 // };
 
 
-// 1、各洲累计确诊分布（海外）
+// 1、各大洲累计确诊分布(不包含国内)
 (function () {
     //初识化ECharts
     var myChart = echarts.init(document.querySelector(".bar .chart"));
@@ -191,7 +191,7 @@
 })();
 
 
-// 3、全球疫情趋势（海外）
+// 3、全球疫情数据趋势(不包含国内)
 (function () {
     var myChart = echarts.init(document.querySelector('.line .chart'))
     var option = {
@@ -563,7 +563,7 @@
     var deadRateCount = []
     var healRateCount = []
     var date = []
-    //  全球疫情趋势（海外）
+    //  全球疫情趋势
     $.ajax({
         url: 'http://127.0.0.1:5000/global/daily',
         type: 'get',
@@ -891,13 +891,14 @@
     myChart.setOption(option);
     var virus = []
     $.ajax({
-        url: 'http://127.0.0.1:5000/china/map',
+        url: 'http://127.0.0.1:5000/china/total',
         type: 'get',
         // data: {},
         dataType: 'json',
         success: function (data) {
             virus.push({
                 'continent': data.continent,
+                // 用于visualMap与地图区域对应
                 'name': data.name,
                 'confirm': data.confirm,
                 'confirm_add': data.confirm_add,
@@ -927,6 +928,7 @@
             data.forEach(item => {
                 virus.push({
                     'continent': item.continent,
+                    // 用于visualMap与地图区域对应
                     'name': item.name,
                     'confirm': item.confirm,
                     'confirm_add': item.confirm_add,

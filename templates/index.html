@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>全球疫情地图</title>
+    <title>基于大数据的疫情监控与预测系统</title>
     <script src="../static/js/echarts.min.js"></script>
     <script src="../static/js/jquery.js"></script>
     <link rel="stylesheet" href="../static/css/index.css">
@@ -12,9 +12,9 @@
 
 <body>
 <header>
-    <h1> 全球疫情地图 </h1>
+    <h1>基于大数据的疫情监控与预测系统</h1>
     <div class="showTime"></div>
-    <div class="index"><a href="http://127.0.0.1:5000/">首页</a></div>
+    <div class="index"><a href="http://127.0.0.1:5000/">全球</a></div>
     <script>
         var formaDate = function () {
             var d = new Date()
@@ -41,12 +41,12 @@
     <!-- 左 -->
     <div class="column">
         <div class="panel bl bar">
-            <h2>各洲累计确诊分布（海外）</h2>
+            <h2>各大洲累计确诊分布(不包含国内)</h2>
             <div class="chart"></div>
             <div class="panelFooter"></div>
         </div>
         <div class="panel bl line">
-            <h2>全球疫情趋势（海外）</h2>
+            <h2>全球疫情数据趋势(不包含国内)</h2>
             <div class="chart"></div>
             <div class="panelFooter"></div>
         </div>
@@ -80,7 +80,7 @@
     <!-- 右 -->
     <div class="column">
         <div class="panel bl bar1">
-            <h2>各国累计确诊Top-15</h2>
+            <h2>各国累计确诊Top-15(不包含国内)</h2>
             <div class="chart"></div>
             <div class="panelFooter"></div>
         </div>

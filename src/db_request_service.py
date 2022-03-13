@@ -2,6 +2,7 @@
 import json
 
 import pandas as pd
+from sqlalchemy import and_, desc
 
 """
 从MySQL获取数据并处理服务
@@ -14,7 +15,31 @@ def get_most_new_data_by_last_update_time(ModelClassType):
     根据last_update_time返回最新的数据: 仅限有last_update_time的模型类
     :return:
     """
-    return ModelClassType.query.order_by('last_update_time').limit(1).all()[0]
+    return ModelClassType.query.order_by(desc(ModelClassType.last_update_time)).limit(1).all()[0]
+
+
+def get_province_data_by_name_and_china_total_id(ChinaProvince, province_name, china_total_id):
+    """
+    根据省名称和国内总数据id查询省的数据
+    :return:
+    """
+    return ChinaProvince.query.filter(
+        and_(ChinaProvince.name == province_name, ChinaProvince.china_total_id == china_total_id)).all()[0]
+
+
+def get_data_by_global_wom_world_id(ModelTypeClass, global_wom_world_id):
+    """
+    根据global_wom_world_id查询此数据是否已经保存
+    :param ModelTypeClass:
+    :param global_wom_world_id:
+    :return:
+    """
+    data_in_mysql_list = ModelTypeClass.query.filter(
+        ModelTypeClass.global_wom_world_id == global_wom_world_id).all()
+    if len(data_in_mysql_list) > 0:
+        return data_in_mysql_list[0]
+    else:
+        return None
 
 
 def get_global_aboard(GlobalWomWorld, GlobalWomAboard):
@@ -70,12 +95,12 @@ def get_global_head_fifteen(GlobalWomWorld, GlobalWomAboard):
         by="confirm", ascending=False)[:15].to_json(orient='records')
 
 
-def get_china_total_and_daily(ChinaTotal, ChinaCompareDaily):
+def get_china_total(ChinaTotal, ChinaCompareDaily):
     """
     国内疫情数据
     :return:
     """
-    # 获取最新的数据
+    # 获取最新的数据 汇总数据+较昨日数据变化
     most_new_china_total_data = get_most_new_data_by_last_update_time(ChinaTotal)
     most_new_china_compare_data = get_most_new_china_compare_daily(ChinaCompareDaily, most_new_china_total_data.id)
     return json.dumps({
@@ -98,9 +123,43 @@ def get_china_total_and_daily(ChinaTotal, ChinaCompareDaily):
 
 def get_most_new_china_compare_daily(ChinaCompareDaily, china_total_id):
     """
-    根据最新国内汇总数据的id获取最新的较上日数据
+    根据最新国内汇总数据的id, 获取较昨日变化数据
     :return:
     """
     # 获取最新的各国数据, 将属性提取出来
     return list(map(lambda x: x.__self_dict__(),
                     ChinaCompareDaily.query.filter(ChinaCompareDaily.china_total_id == china_total_id).all()))[0]
+
+
+def get_china_province(ChinaTotal, ChinaProvince):
+    """
+    获取最新国内各省数据
+    :return:
+    """
+    return json.dumps(list(map(lambda x: x.__self_dict__(),
+                               ChinaProvince.query.filter(
+                                   ChinaProvince.china_total_id == get_most_new_data_by_last_update_time(
+                                       ChinaTotal).id).all())), ensure_ascii=False)
+
+
+def get_china_all_city(ChinaTotal, ChinaProvince, ChinaCity):
+    """
+    获取国内各城市数据
+    :return:
+    """
+    # 最新各省数据的id
+    province_id_list = list(map(lambda x: x['id'], json.loads(get_china_province(ChinaTotal, ChinaProvince))))
+
+    return json.dumps(list(map(lambda x: x.__self_dict__(),
+                               ChinaCity.query.filter(
+                                   ChinaCity.china_province_id.in_(province_id_list)).all())), ensure_ascii=False)
+
+
+def get_china_city_by_province_id(ChinaCity, china_province_id):
+    """
+    根据省份id获取最新的城市数据
+    :return:
+    """
+    return json.dumps(list(map(lambda x: x.__self_dict__(),
+                               ChinaCity.query.filter(
+                                   and_(ChinaCity.china_province_id == china_province_id)).all())), ensure_ascii=False)
