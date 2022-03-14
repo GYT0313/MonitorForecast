@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import json
+from datetime import timedelta
 
 import pymysql
 from flask import Flask, request
@@ -19,6 +20,13 @@ app = Flask(__name__)
 app.config.from_object(database_config.DatabaseConfig)
 db = SQLAlchemy(app)
 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=3)
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    return render_template("test.html")
+
 
 @app.route('/', methods=['GET'])
 def home():
@@ -29,6 +37,8 @@ def home():
 def index():
     return render_template("index.html")
 
+
+# ###############################全球################################
 
 @app.route('/global/continent', methods=['GET'])
 def global_continent():
@@ -68,6 +78,8 @@ def global_head_fifteen():
         GlobalWomWorld, GlobalWomAboard)
 
 
+# ###############################国内################################
+
 @app.route('/china/total', methods=['GET'])
 def china_total():
     """
@@ -99,11 +111,29 @@ def china_all_city():
 @app.route('/china/city', methods=['POST'])
 def china_city():
     """
-    国内各省数据
+    根据省份查询城市数据
     :return:
     """
     china_province_id = json.loads(request.data)['china_province_id']
     return db_request_service.get_china_city_by_province_id(ChinaCity, china_province_id)
+
+
+@app.route('/china/daily', methods=['GET'])
+def china_compare_daily():
+    """
+    国内较昨日变化趋势数据
+    :return:
+    """
+    return db_request_service.get_china_compare_daily(ChinaCompareDaily)
+
+
+@app.route('/china/province/head', methods=['GET'])
+def china_province_head_fifteen():
+    """
+    各省前15数据
+    :return:
+    """
+    return db_request_service.china_province_head_fifteen(ChinaTotal, ChinaProvince)
 
 
 class Jobs(object):
@@ -453,7 +483,7 @@ if __name__ == '__main__':
 
     # app初始化
     app_init()
-    table_init()
+    # table_init()
 
     # 添加定时任务
     schedule.add_job(id='pull_global', func=Jobs.pull_global, trigger='interval', hours=1)

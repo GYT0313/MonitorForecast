@@ -27,19 +27,19 @@ def get_province_data_by_name_and_china_total_id(ChinaProvince, province_name, c
         and_(ChinaProvince.name == province_name, ChinaProvince.china_total_id == china_total_id)).all()[0]
 
 
-def get_data_by_global_wom_world_id(ModelTypeClass, global_wom_world_id):
-    """
-    根据global_wom_world_id查询此数据是否已经保存
-    :param ModelTypeClass:
-    :param global_wom_world_id:
-    :return:
-    """
-    data_in_mysql_list = ModelTypeClass.query.filter(
-        ModelTypeClass.global_wom_world_id == global_wom_world_id).all()
-    if len(data_in_mysql_list) > 0:
-        return data_in_mysql_list[0]
-    else:
-        return None
+# def get_data_by_global_wom_world_id(ModelTypeClass, global_wom_world_id):
+#     """
+#     根据global_wom_world_id查询此数据是否已经保存
+#     :param ModelTypeClass:
+#     :param global_wom_world_id:
+#     :return:
+#     """
+#     data_in_mysql_list = ModelTypeClass.query.filter(
+#         ModelTypeClass.global_wom_world_id == global_wom_world_id).all()
+#     if len(data_in_mysql_list) > 0:
+#         return data_in_mysql_list[0]
+#     else:
+#         return None
 
 
 def get_global_aboard(GlobalWomWorld, GlobalWomAboard):
@@ -163,3 +163,30 @@ def get_china_city_by_province_id(ChinaCity, china_province_id):
     return json.dumps(list(map(lambda x: x.__self_dict__(),
                                ChinaCity.query.filter(
                                    and_(ChinaCity.china_province_id == china_province_id)).all())), ensure_ascii=False)
+
+
+def get_china_compare_daily(ChinaCompareDaily):
+    """
+    获取国内较昨日疫情变化趋势数据
+    :param ChinaCompareDaily:
+    :return:
+    """
+    # 将datetime 转为 str
+    result = []
+    for item in list(map(lambda x: x.__self_dict__(), ChinaCompareDaily.query.all())):
+        item['date_time'] = str(item['date_time'].date())
+        result.append(item)
+    return json.dumps(result, ensure_ascii=False)
+
+
+def china_province_head_fifteen(ChinaTotal, ChinaProvince):
+    """
+    各省累计确诊前15数据
+    :param ChinaTotal:
+    :param ChinaProvince:
+    :return:
+    """
+    most_new_china_total = get_most_new_data_by_last_update_time(ChinaTotal)
+    return pd.DataFrame(list(map(lambda x: x.__self_dict__(), ChinaProvince.query.filter(
+        ChinaProvince.china_total_id == most_new_china_total.id).all()))).sort_values(by="confirm", ascending=False)[
+           :15].to_json(orient='records')

@@ -14,7 +14,6 @@
 <header>
     <h1>基于大数据的疫情监控与预测系统</h1>
     <div class="showTime"></div>
-    <div class="index"><a href="http://127.0.0.1:5000/">全球</a></div>
     <script>
         var formaDate = function () {
             var d = new Date()
@@ -35,65 +34,261 @@
             $('.showTime').html(a);
         }
         setInterval(formaDate, 1000) //设定定时器，循环运行;
+
+        window.onload = function () {
+            var sections = document.getElementById("views");
+
+            var indexes = sections.getElementsByClassName("index")
+            var aSection = sections.getElementsByClassName("aSection")
+            console.log(indexes.length)
+            console.log(aSection.length)
+
+            for (var i = 0; i < indexes.length; i++) {
+                indexes[i].index = i;
+                indexes[i].onclick = function () {
+                    for (var j = 0; j < indexes.length; j++) {
+                        indexes[j].style.background = 'none'
+                        aSection[j].style.display = "none";
+                    }
+                    this.style.background = 'green'
+                    aSection[this.index].style.display = "block";
+                }
+            }
+        }
     </script>
+
 </header>
-<section class="mainbox">
-    <!-- 左 -->
-    <div class="column">
-        <div class="panel bl bar">
-            <h2>各大洲累计确诊分布(不包含国内)</h2>
-            <div class="chart"></div>
-            <div class="panelFooter"></div>
-        </div>
-        <div class="panel bl line">
-            <h2>全球疫情数据趋势(不包含国内)</h2>
-            <div class="chart"></div>
-            <div class="panelFooter"></div>
-        </div>
+<div id="views">
+    <div class="tabs">
+        <div class="active index index1"><h3>全球</h3></div>
+        <div class="index index2"><h3>国内</h3></div>
+        <div class="index index3"><h3>城市</h3></div>
+        <div class="index index4"><h3>预测</h3></div>
     </div>
-    <!-- 中 -->
-    <div class="column">
-        <!-- 上模块 -->
-        <div class="no">
-            <div class="no-hd">
-                <ul>
-                    <li></li>
-                    <li></li>
-                </ul>
+
+    <!--全球-->
+    <div class="active aSection" style="display:block">
+        <section class="mainbox">
+            <!-- 左 -->
+            <div class="column">
+                <div class="panel bl bar">
+                    <h2>各大洲累计确诊分布(不包含国内)</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+                <div class="panel bl line">
+                    <h2>全球疫情数据趋势(不包含国内)</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
             </div>
-            <div class="no-bd">
-                <ul>
-                    <li>累计确诊人数</li>
-                    <li>累计治愈人数</li>
-                </ul>
+            <!-- 中 -->
+            <div class="column">
+                <!-- 上模块 -->
+                <div class="no">
+                    <div class="no-hd">
+                        <ul>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div class="no-bd">
+                        <ul>
+                            <li>累计确诊人数</li>
+                            <li>累计治愈人数</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- 地图模块 -->
+                <div class="map">
+                    <div class="map1"></div>
+                    <div class="map2"></div>
+                    <div class="map3"></div>
+                    <div class="chart" id="viewDiv"></div>
+                    <div class="panelFooter"></div>
+                </div>
             </div>
-        </div>
-        <!-- 地图模块 -->
-        <div class="map">
-            <div class="map1"></div>
-            <div class="map2"></div>
-            <div class="map3"></div>
-            <div class="chart" id="viewDiv"></div>
-            <div class="panelFooter"></div>
-        </div>
+            <!-- 右 -->
+            <div class="column">
+                <div class="panel bl bar1">
+                    <h2>各国累计确诊Top-15(不包含国内)</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+        </section>
     </div>
-    <!-- 右 -->
-    <div class="column">
-        <div class="panel bl bar1">
-            <h2>各国累计确诊Top-15(不包含国内)</h2>
-            <div class="chart"></div>
-            <div class="panelFooter"></div>
-        </div>
+
+    <!--国内-->
+    <div class="aSection" style="display: none">
+        <section class="mainbox">
+            <!-- 左 -->
+            <div class="column">
+                <div class="panel bl chinaBar">
+                    <h2>各地区累计确诊分布</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+                <div class="panel bl chinaLine">
+                    <h2>国内疫情数据趋势</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+            <!-- 中 -->
+            <div class="column">
+                <!-- 上模块 -->
+                <div class="no">
+                    <div class="no-hd">
+                        <ul>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div class="no-bd">
+                        <ul>
+                            <li>累计确诊人数</li>
+                            <li>累计治愈人数</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- 地图模块 -->
+                <div class="chinaMap">
+                    <div class="map1"></div>
+                    <div class="map2"></div>
+                    <div class="map3"></div>
+                    <div class="chart" id="viewDiv"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+            <!-- 右 -->
+            <div class="column">
+                <div class="panel bl chinaBar1">
+                    <h2>各省累计确诊Top-15</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+        </section>
     </div>
-    <div class="data">数据来源于腾讯</div>
-</section>
+
+    <!--城市-->
+    <div class="aSection" style="display: none">
+        <section class="mainbox">
+            <!-- 左 -->
+            <div class="column">
+                <div class="panel bl bar">
+                    <h2>各城市累计确诊分布</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+                <div class="panel bl line">
+                    <h2>城市疫情数据趋势</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+            <!-- 中 -->
+            <div class="column">
+                <!-- 上模块 -->
+                <div class="no">
+                    <div class="no-hd">
+                        <ul>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div class="no-bd">
+                        <ul>
+                            <li>累计确诊人数</li>
+                            <li>累计治愈人数</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- 地图模块 -->
+                <div class="map">
+                    <div class="map1"></div>
+                    <div class="map2"></div>
+                    <div class="map3"></div>
+                    <div class="chart" id="viewDiv"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+            <!-- 右 -->
+            <div class="column">
+                <div class="panel bl bar1">
+                    <h2>城市累计确诊Top-15</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!--预测-->
+    <div class="aSection" style="display: none">
+        <section class="mainbox">
+            <!-- 左 -->
+            <div class="column">
+                <div class="panel bl bar">
+                    <h2>预测</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+                <div class="panel bl line">
+                    <h2>预测</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+            <!-- 中 -->
+            <div class="column">
+                <!-- 上模块 -->
+                <div class="no">
+                    <div class="no-hd">
+                        <ul>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div class="no-bd">
+                        <ul>
+                            <li>累计确诊人数</li>
+                            <li>累计治愈人数</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- 地图模块 -->
+                <div class="map">
+                    <div class="map1"></div>
+                    <div class="map2"></div>
+                    <div class="map3"></div>
+                    <div class="chart" id="viewDiv"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+            <!-- 右 -->
+            <div class="column">
+                <div class="panel bl bar1">
+                    <h2>预测</h2>
+                    <div class="chart"></div>
+                    <div class="panelFooter"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+</div>
 
 <!--布局-->
 <script src="../static/js/flexible.js"></script>
 <script src="../static/js/world.js"></script>
+<script src="../static/js/china.js"></script>
 {#<script src="../static/js/echarts.min.js"></script>#}
 <!--     <script src="js/arcgis.js"></script> -->
 <script src="../static/js/index.js"></script>
+<script src="../static/js/china-java-script.js"></script>
 
 <script>
     // 全球疫情地图
