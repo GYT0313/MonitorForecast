@@ -19,6 +19,14 @@ def get_most_new_data_by_last_update_time(ModelClassType):
     """
     return ModelClassType.query.order_by(desc(ModelClassType.last_update_time)).limit(1).all()[0]
 
+def get_most_new_data_by_last_update_time_and_name(ModelClassType, name):
+    """
+    根据last_update_time 和name返回最新的数据: 仅限有last_update_time 和name的模型类
+    :return:
+    """
+    return \
+        ModelClassType.query.filter(ModelClassType.name == name).order_by(desc(ModelClassType.last_update_time)).limit(
+            1).all()[0]
 
 def get_province_data_by_name_and_china_total_id(ChinaProvince, province_name, china_total_id):
     """
@@ -214,3 +222,16 @@ def china_region(ChinaTotal, ChinaProvince):
     df_province['region'] = df_province.apply(lambda row: region_map[row[1]], axis=1)
     # 分组求和
     return df_province.groupby(by=['region'], as_index=False).sum().to_json(orient='records')
+
+
+def china_province_of_city(ChinaTotal, ChinaProvince, ChinaCity, province_name):
+    """
+
+    :return:
+    """
+    most_new_china_total = get_most_new_data_by_last_update_time(ChinaTotal)
+    province_of_city = ChinaProvince.query.filter(
+        and_(ChinaProvince.name == province_name, ChinaProvince.china_total_id == most_new_china_total.id)).all()[0]
+    return json.dumps(list(map(lambda x: x.__self_dict__(),
+                               ChinaCity.query.filter(ChinaCity.china_province_id == province_of_city.id).all())),
+                      ensure_ascii=False)

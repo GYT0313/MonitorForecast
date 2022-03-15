@@ -144,7 +144,13 @@ def china_region():
     """
     return db_request_service.china_region(ChinaTotal, ChinaProvince)
 
-
+@app.route('/china/province/city/')
+def china_province_of_city():
+    """
+    根据省名获取城市数据
+    :return:
+    """
+    return db_request_service.china_province_of_city(ChinaTotal, ChinaProvince, ChinaCity, "黑龙江");
 
 @app.route('/pull', methods=['GET'])
 def pull():

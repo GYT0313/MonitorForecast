@@ -213,6 +213,15 @@ header h1 {
     height: 10.3rem;
 }
 
+.provinceBar1 {
+    height: 10.3rem;
+}
+
+.provinceBar1 .chart {
+    height: 10.3rem;
+}
+
+
 .no {
     background-color: rgba(101, 132, 226, 0.1);
     padding: 0.15rem;
@@ -305,6 +314,22 @@ header h1 {
 }
 
 .chinaMap .chart {
+    /* background-color: #151965; */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8.95rem;
+    border: 1px solid rgba(25, 186, 139, 0.17);
+}
+
+.provinceMap {
+    height: 8.95rem;
+    position: relative;
+    /* border: 2px solid #02a6b5; */
+}
+
+.provinceMap .chart {
     /* background-color: #151965; */
     position: absolute;
     top: 0;

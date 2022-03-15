@@ -607,7 +607,7 @@
     var myChart = echarts.init(document.querySelector('.chinaMap .chart'))
     var option = {
         title: {
-            text: '全球各国确诊情况',
+            text: '国内各省确诊情况',
             // subtext: '累计确诊人数',
             left: 'center',
             textStyle: {
