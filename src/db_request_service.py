@@ -4,6 +4,8 @@ import json
 import pandas as pd
 from sqlalchemy import and_, desc
 
+from common_config import region_map
+
 """
 从MySQL获取数据并处理服务
 """
@@ -136,10 +138,18 @@ def get_china_province(ChinaTotal, ChinaProvince):
     获取最新国内各省数据
     :return:
     """
-    return json.dumps(list(map(lambda x: x.__self_dict__(),
-                               ChinaProvince.query.filter(
-                                   ChinaProvince.china_total_id == get_most_new_data_by_last_update_time(
-                                       ChinaTotal).id).all())), ensure_ascii=False)
+    return json.dumps(inner_get_china_province(ChinaTotal, ChinaProvince), ensure_ascii=False)
+
+
+def inner_get_china_province(ChinaTotal, ChinaProvince):
+    """
+    获取最新国内各省数据
+    :return:
+    """
+    return list(map(lambda x: x.__self_dict__(),
+                    ChinaProvince.query.filter(
+                        ChinaProvince.china_total_id == get_most_new_data_by_last_update_time(
+                            ChinaTotal).id).all()))
 
 
 def get_china_all_city(ChinaTotal, ChinaProvince, ChinaCity):
@@ -190,3 +200,17 @@ def china_province_head_fifteen(ChinaTotal, ChinaProvince):
     return pd.DataFrame(list(map(lambda x: x.__self_dict__(), ChinaProvince.query.filter(
         ChinaProvince.china_total_id == most_new_china_total.id).all()))).sort_values(by="confirm", ascending=False)[
            :15].to_json(orient='records')
+
+
+def china_region(ChinaTotal, ChinaProvince):
+    """
+    国内各地区数据饼图 - 如华南、华北等
+    :param ChinaTotal:
+    :param ChinaProvince:
+    :return:
+    """
+    df_province = pd.DataFrame(inner_get_china_province(ChinaTotal, ChinaProvince))
+    # 新增region列
+    df_province['region'] = df_province.apply(lambda row: region_map[row[1]], axis=1)
+    # 分组求和
+    return df_province.groupby(by=['region'], as_index=False).sum().to_json(orient='records')

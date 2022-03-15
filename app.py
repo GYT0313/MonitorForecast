@@ -136,6 +136,31 @@ def china_province_head_fifteen():
     return db_request_service.china_province_head_fifteen(ChinaTotal, ChinaProvince)
 
 
+@app.route('/china/region')
+def china_region():
+    """
+    国内各地区数据饼图 - 如华南、华北等
+    :return:
+    """
+    return db_request_service.china_region(ChinaTotal, ChinaProvince)
+
+
+
+@app.route('/pull', methods=['GET'])
+def pull():
+    Jobs.pull_global()
+    Jobs.pull_china()
+    return '<h3>Pull global and china data success!</h3>'
+
+
+@app.errorhandler(Exception)
+def handler_exception(err):
+    app.logger.error(str(err))
+    return str(err)
+
+
+# #############################################################################################
+
 class Jobs(object):
     """
     定时任务
@@ -167,19 +192,6 @@ class Jobs(object):
             ChinaCity=ChinaCity)
 
 
-@app.route('/pull', methods=['GET'])
-def pull():
-    Jobs.pull_global()
-    Jobs.pull_china()
-    return '<h3>Pull global and china data success!</h3>'
-
-
-@app.errorhandler(Exception)
-def handler_exception(err):
-    app.logger.error(str(err))
-    return str(err)
-
-
 def app_init():
     """
         初始化app
@@ -199,9 +211,7 @@ def get_app():
 #     return db
 
 
-"""
-模型类
-"""
+# #################################模型类#####################################
 
 
 class GlobalWomWorld(db.Model):
@@ -363,7 +373,7 @@ class ChinaCompareDaily(db.Model):
     now_confirm_compare = db.Column(db.BigInteger, comment='较昨日现有确诊')
     suspect_compare = db.Column(db.BigInteger, comment='较昨日疑似')
     now_severe_compare = db.Column(db.BigInteger, comment='较昨日重症')
-    date_time = db.Column(db.DateTime, comment='上次更新时间-的年月日')
+    date_time = db.Column(db.DateTime, unique=True, comment='上次更新时间-的年月日')
     china_total_id = db.Column(
         db.Integer,
         db.ForeignKey('t_china_total.id'),
@@ -467,6 +477,8 @@ class ChinaCity(db.Model):
         }
 
 
+# ###############################################################################
+
 def table_init():
     """
     表结构初始化
@@ -486,8 +498,8 @@ if __name__ == '__main__':
     # table_init()
 
     # 添加定时任务
-    schedule.add_job(id='pull_global', func=Jobs.pull_global, trigger='interval', hours=1)
-    schedule.add_job(id='pull_china', func=Jobs.pull_china, trigger='interval', hours=1)
+    schedule.add_job(id='pull_global', func=Jobs.pull_global, trigger='interval', minutes=30)
+    schedule.add_job(id='pull_china', func=Jobs.pull_china, trigger='interval', minutes=30)
     schedule.start()
 
     app.run(debug=True, use_reloader=False)

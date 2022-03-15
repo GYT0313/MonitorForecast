@@ -276,7 +276,7 @@ def save_china_daily(db, ChinaCompareDaily, data, date_time, china_total_id):
         no_id_dict = china_compare_daily.__self_dict__()
         no_id_dict.pop('id')
         is_update = ChinaCompareDaily.query.filter(
-            and_(ChinaCompareDaily.date_time == date_time, ChinaCompareDaily.china_total_id == china_total_id)).update(
+            and_(ChinaCompareDaily.date_time == date_time)).update(
             no_id_dict)
         if is_update <= 0:
             db.session.add(china_compare_daily)
