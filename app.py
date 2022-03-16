@@ -23,11 +23,6 @@ db = SQLAlchemy(app)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=3)
 
 
-@app.route('/test', methods=['GET'])
-def test():
-    return render_template("test.html")
-
-
 @app.route('/', methods=['GET'])
 def home():
     return redirect(url_for('index'))
@@ -39,6 +34,14 @@ def index():
 
 
 # ###############################全球################################
+@app.route('/global/data', methods=['GET'])
+def global_data():
+    """
+    全球疫情数据(包含中国)
+    :return:
+    """
+    return db_request_service.get_global_data(GlobalWomWorld, ChinaTotal)
+
 
 @app.route('/global/continent', methods=['GET'])
 def global_continent():
@@ -133,24 +136,36 @@ def china_province_head_fifteen():
     各省前15数据
     :return:
     """
-    return db_request_service.china_province_head_fifteen(ChinaTotal, ChinaProvince)
+    return db_request_service.get_china_province_head_fifteen(ChinaTotal, ChinaProvince)
 
 
-@app.route('/china/region')
+@app.route('/china/region', methods=['GET'])
 def china_region():
     """
     国内各地区数据饼图 - 如华南、华北等
     :return:
     """
-    return db_request_service.china_region(ChinaTotal, ChinaProvince)
+    return db_request_service.get_china_region(ChinaTotal, ChinaProvince)
 
-@app.route('/china/province/city/')
+
+@app.route('/china/province/city', methods=['GET'])
 def china_province_of_city():
     """
     根据省名获取城市数据
     :return:
     """
-    return db_request_service.china_province_of_city(ChinaTotal, ChinaProvince, ChinaCity, "黑龙江");
+    params = request.args.to_dict()
+    return db_request_service.get_china_province_of_city(ChinaTotal, ChinaProvince, ChinaCity, params);
+
+
+@app.route('/china/province/city/json', methods=['GET'])
+def china_province_of_city_json():
+    """
+    获取各省对应的城市json
+    :return:
+    """
+    return db_request_service.get_china_province_of_city_json(ChinaTotal, ChinaProvince, ChinaCity)
+
 
 @app.route('/pull', methods=['GET'])
 def pull():

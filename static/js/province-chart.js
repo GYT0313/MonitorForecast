@@ -1,3 +1,188 @@
+// 省-城市二级联动
+(function () {
+    $.ajax({
+        url: "http://127.0.0.1:5000/china/province/city/json",
+        type: "get",
+        dataType: "json",
+        success: function (retJson) {
+            renderList(retJson)
+        }
+    })
+
+    function renderList(jsonObj) {
+        var allProvinces = jsonObj.provinces
+        // 得到所有省份的数据
+
+        $("#province").empty()
+
+        // 这里利用forEach循环添加省份的数据
+        allProvinces.forEach(function (element) {
+            var option = $(`<option value="${element.name}">${element.name}</option>`)
+            // option.appendTo("#province")
+            $("#province").append(option)
+        });
+
+        // 给省份的选择框添加change事件
+        $("#province").change(function () {
+            var curProvince = $("#province>option:selected").val();
+            // 得到当前选中的省份的val值
+
+            var selectedProvince = allProvinces.find(function (curElement, index) {
+                // find() 方法获得当前元素集合中每个元素的后代，通过选择器、jQuery 对象或元素来筛选。
+
+                return curElement.name == curProvince;
+                // 将当前选中省份的名字返回给 selectedProvince
+            })
+
+            var allCities = selectedProvince.cities;
+            // allCities指当前被选中省份下的所有城市
+
+            $("#city").empty()
+            // select之前选中显示的文本还残留在select框里，为了去掉残留的文本，需要清空城市选择框的内容
+
+            // 这里利用forEach循环添加城市的数据
+            allCities.forEach(function (element) {
+                var option = $(`<option value="${element.name}">${element.name}</option>`)
+                option.appendTo("#city");
+            });
+        })
+
+        $("#province").triggerHandler("change");
+        // 这个方法将会触发指定的事件类型上所有绑定的处理函数。但不会执行浏览器默认动作，也不会产生事件冒泡。
+    }
+})();
+
+function buttonClick() {
+    var province = document.getElementById("province")
+    var city = document.getElementById("city")
+    var provinceName = province.options[province.selectedIndex].text
+    var cityName = city.options[city.selectedIndex].text
+
+    var params = {
+        "province": provinceName,
+        "city": cityName
+    }
+    // 地图json与名称需要匹配
+    var specialMap = {
+        "内蒙古": "自治区",
+        "西藏": "自治区",
+        "宁夏": "回族自治区",
+        "广西": "壮族自治区",
+        "新疆": "维吾尔自治区",
+        "香港": "特别行政区",
+        "澳门": "特别行政区",
+        "上海": "市",
+        "北京": "市",
+        "天津": "市",
+        "重庆": "市",
+    }
+    // 拼接
+    console.log(provinceName)
+    console.log(specialMap[provinceName])
+    provinceName = specialMap[provinceName] != null ? provinceName + specialMap[provinceName] : provinceName + "省";
+
+    $.get('../static/js/map/province/' + provinceName + '.json', function (mapJson) {
+        echarts.registerMap("黑龙江", mapJson)
+        var myChart = echarts.init(document.querySelector('.provinceMap .chart'))
+        var option = {
+            title: {
+                text: '黑龙江各城市确诊情况',
+                // subtext: '累计确诊人数',
+                left: 'center',
+                textStyle: {
+                    color: 'white'
+                },
+                top: 'top'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function (params) {
+                    return params.data.name + "</br>" +
+                        "累计确诊: " + params.data.confirm + "</br>" +
+                        "累计治愈: " + params.data.heal + "</br>" +
+                        "累计死亡: " + params.data.dead + "</br>" +
+                        "现有确诊: " + params.data.now_confirm + "</br>" +
+                        "较昨日确诊: " + (params.data.confirm_compare > 0 ? '+' + params.data.confirm_compare : params.data.confirm_compare);
+                }
+            },
+            visualMap: {
+                show: true,
+                min: 0,
+                max: 100,
+                text: ['High', 'Low'],
+                realtime: false,
+                calculable: false,
+                textStyle: {
+                    color: 'white'
+                },
+                color: ['#481380', '#7f78d2', '#efb1ff', '#ffe2ff']
+            },
+            series: [
+                {
+                    name: '累计确诊人数',
+                    type: 'map',
+                    mapType: '黑龙江',
+                    roam: true,
+                    itemStyle: {
+                        normal: {
+                            areaColor: '#fce8d5',
+                            borderColor: 'rgb(0,108,255)',
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                color: 'black'
+                            },
+                            areaColor: '#fce8d5'
+                        }
+                    }
+
+                    // nameMap: nameMap,
+                    // data:
+                }]
+        };
+        // 把配置和数据给实例对象
+        myChart.setOption(option);
+        var virus = []
+        $.ajax({
+            url: 'http://127.0.0.1:5000/china/province/city',
+            type: 'get',
+            data: params,
+            dataType: 'json',
+            success: function (data) {
+                data.forEach(item => {
+                    virus.push({
+                        // 用于visualMap与地图区域对应
+                        'name': item.name,
+                        'confirm': item.confirm,
+                        'heal': item.heal,
+                        'dead': item.dead,
+                        'now_confirm': item.now_confirm,
+                        'confirm_compare': item.confirm_compare,
+                        // 用于visualMap筛选, 颜色显示
+                        'value': item.confirm
+                    })
+                })
+                myChart.setOption({ //加载数据图表
+                    series: [{
+                        // 根据名字对应到相应的系列
+                        data: virus
+                    }]
+                })
+            }
+        });
+        window.addEventListener('resize', function () {
+            myChart.resize()
+        })
+    })
+}
+
+//
+(function () {
+
+})();
+
+
 // // //中国疫情数据
 // // var china = function () {
 // //     $.ajax({
@@ -6,7 +191,6 @@
 // //         // data: {},
 // //         dataType: 'jsonp',
 // //         success: function (data) {
-// //             console.log(data.confirm)
 // //             return data.confirm
 // //         }
 // //     })
@@ -603,117 +787,115 @@
 //
 
 // 4、黑龙江疫情地图
-(function () {
-    $.get('../static/js/map/province/黑龙江省.json', function (mapJson){
-        echarts.registerMap("黑龙江", mapJson)
-        var myChart = echarts.init(document.querySelector('.provinceMap .chart'))
-        var option = {
-            title: {
-                text: '黑龙江各城市确诊情况',
-                // subtext: '累计确诊人数',
-                left: 'center',
-                textStyle: {
-                    color: 'white'
-                },
-                top: 'top'
-            },
-            tooltip: {
-                trigger: 'item',
-                formatter: function (params) {
-                    console.log(params)
-                    // var value = params.value + '';
-                    // return params.seriesName + '<br/>' + params.name + ' : ' + params.data[2] + '人';
-                    return params.data.name + "</br>" +
-                        "累计确诊: " + params.data.confirm + "</br>" +
-                        "累计治愈: " + params.data.heal + "</br>" +
-                        "累计死亡: " + params.data.dead + "</br>" +
-                        "现有确诊: " + params.data.now_confirm + "</br>" +
-                        "较昨日确诊: " + (params.data.confirm_compare > 0 ? '+' + params.data.confirm_compare : params.data.confirm_compare);
-                }
-            },
-            visualMap: {
-                show: true,
-                min: 0,
-                max: 100,
-                text: ['High', 'Low'],
-                realtime: false,
-                calculable: false,
-                textStyle: {
-                    color: 'white'
-                },
-                color: ['#481380', '#7f78d2', '#efb1ff', '#ffe2ff']
-            },
-            // geo: {
-            //     // 这个是重点配置区
-            //     map: "china", // 表示中国地图
-            //     roam: true,
-            //     label: {
-            //         normal: {
-            //             show: true, // 是否显示对应地名
-            //             textStyle: {
-            //                 color: "#fff",
-            //             },
-            //         },
-            //     }
-            // },
-            series: [
-                {
-                    name: '累计确诊人数',
-                    type: 'map',
-                    mapType: '黑龙江',
-                    roam: true,
-                    itemStyle: {
-                        normal: {
-                            areaColor: '#fce8d5',
-                            borderColor: 'rgb(0,108,255)',
-                        },
-                        emphasis: {
-                            label: {
-                                show: true,
-                                color: 'black'
-                            },
-                            areaColor: '#fce8d5'
-                        }
-                    }
+// (function () {
+    // $.get('../static/js/map/province/黑龙江省.json', function (mapJson){
+    //     echarts.registerMap("黑龙江", mapJson)
+    //     var myChart = echarts.init(document.querySelector('.provinceMap .chart'))
+    //     var option = {
+    //         title: {
+    //             text: '黑龙江各城市确诊情况',
+    //             // subtext: '累计确诊人数',
+    //             left: 'center',
+    //             textStyle: {
+    //                 color: 'white'
+    //             },
+    //             top: 'top'
+    //         },
+    //         tooltip: {
+    //             trigger: 'item',
+    //             formatter: function (params) {
+    //                 // var value = params.value + '';
+    //                 // return params.seriesName + '<br/>' + params.name + ' : ' + params.data[2] + '人';
+    //                 return params.data.name + "</br>" +
+    //                     "累计确诊: " + params.data.confirm + "</br>" +
+    //                     "累计治愈: " + params.data.heal + "</br>" +
+    //                     "累计死亡: " + params.data.dead + "</br>" +
+    //                     "现有确诊: " + params.data.now_confirm + "</br>" +
+    //                     "较昨日确诊: " + (params.data.confirm_compare > 0 ? '+' + params.data.confirm_compare : params.data.confirm_compare);
+    //             }
+    //         },
+    //         visualMap: {
+    //             show: true,
+    //             min: 0,
+    //             max: 100,
+    //             text: ['High', 'Low'],
+    //             realtime: false,
+    //             calculable: false,
+    //             textStyle: {
+    //                 color: 'white'
+    //             },
+    //             color: ['#481380', '#7f78d2', '#efb1ff', '#ffe2ff']
+    //         },
+    //         // geo: {
+    //         //     // 这个是重点配置区
+    //         //     map: "china", // 表示中国地图
+    //         //     roam: true,
+    //         //     label: {
+    //         //         normal: {
+    //         //             show: true, // 是否显示对应地名
+    //         //             textStyle: {
+    //         //                 color: "#fff",
+    //         //             },
+    //         //         },
+    //         //     }
+    //         // },
+    //         series: [
+    //             {
+    //                 name: '累计确诊人数',
+    //                 type: 'map',
+    //                 mapType: '黑龙江',
+    //                 roam: true,
+    //                 itemStyle: {
+    //                     normal: {
+    //                         areaColor: '#fce8d5',
+    //                         borderColor: 'rgb(0,108,255)',
+    //                     },
+    //                     emphasis: {
+    //                         label: {
+    //                             show: true,
+    //                             color: 'black'
+    //                         },
+    //                         areaColor: '#fce8d5'
+    //                     }
+    //                 }
+    //
+    //                 // nameMap: nameMap,
+    //                 // data:
+    //             }]
+    //     };
+    //     // 把配置和数据给实例对象
+    //     myChart.setOption(option);
+    //     var virus = []
+    //     $.ajax({
+    //         url: 'http://127.0.0.1:5000/china/province/city/',
+    //         type: 'get',
+    //         // data: {},
+    //         dataType: 'json',
+    //         success: function (data) {
+    //             data.forEach(item => {
+    //                 virus.push({
+    //                     // 用于visualMap与地图区域对应
+    //                     'name': item.name,
+    //                     'confirm': item.confirm,
+    //                     'heal': item.heal,
+    //                     'dead': item.dead,
+    //                     'now_confirm': item.now_confirm,
+    //                     'confirm_compare': item.confirm_compare,
+    //                     // 用于visualMap筛选, 颜色显示
+    //                     'value': item.confirm
+    //                 })
+    //             })
+    //             myChart.setOption({ //加载数据图表
+    //                 series: [{
+    //                     // 根据名字对应到相应的系列
+    //                     data: virus
+    //                 }]
+    //             })
+    //         }
+    //     });
+    //     window.addEventListener('resize', function () {
+    //         myChart.resize()
+    //     })
+    // })
 
-                    // nameMap: nameMap,
-                    // data:
-                }]
-        };
-        // 把配置和数据给实例对象
-        myChart.setOption(option);
-        var virus = []
-        $.ajax({
-            url: 'http://127.0.0.1:5000/china/province/city/',
-            type: 'get',
-            // data: {},
-            dataType: 'json',
-            success: function (data) {
-                data.forEach(item => {
-                    virus.push({
-                        // 用于visualMap与地图区域对应
-                        'name': item.name,
-                        'confirm': item.confirm,
-                        'heal': item.heal,
-                        'dead': item.dead,
-                        'now_confirm': item.now_confirm,
-                        'confirm_compare': item.confirm_compare,
-                        // 用于visualMap筛选, 颜色显示
-                        'value': item.confirm
-                    })
-                })
-                console.log(virus)
-                myChart.setOption({ //加载数据图表
-                    series: [{
-                        // 根据名字对应到相应的系列
-                        data: virus
-                    }]
-                })
-            }
-        });
-        window.addEventListener('resize', function () {
-            myChart.resize()
-        })
-    })
-
-})();
+// })();

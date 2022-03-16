@@ -1,16 +1,17 @@
-// //中国疫情数据
-// var china = function () {
-//     $.ajax({
-//         url: 'http://127.0.0.1:5000/china/map',
-//         type: 'get',
-//         // data: {},
-//         dataType: 'jsonp',
-//         success: function (data) {
-//             console.log(data.confirm)
-//             return data.confirm
-//         }
-//     })
-// };
+// 中间累计数据
+(function () {
+    $.ajax({
+        url: 'http://127.0.0.1:5000/global/data',
+        type: 'get',
+        // data: {},
+        dataType: 'json',
+    }).then((data) => {
+        let sum = data.confirm
+        let cureSum = data.heal
+        $(".no-hd li:first").text(sum)
+        $(".no-hd li:nth-child(2)").text(cureSum)
+    })
+})();
 
 
 // 1、各大洲累计确诊分布(不包含国内)
@@ -101,8 +102,8 @@
             name: '累计确诊',
             type: 'pie',
             clockWise: false,
-            radius: [30, 460],
-            center: ['73%', '80%'],
+            radius: [70, 450],
+            center: ['70%', '70%'],
             roseType: 'area',
             // encode: {
             //     itemName: 'name',
@@ -132,30 +133,17 @@
                     },
                 },
             },
-
         },
             {
                 name: '透明圆圈',
                 type: 'pie',
-                radius: [8, 20],
-                center: ['73%', '80%'],
+                radius: [0, 70],
+                center: ['70%', '70%'],
                 itemStyle: {
                     color: 'rgba(250, 250, 250, 0.3)',
                 },
                 data: [
-                    {value: 5, name: ''}
-                ]
-            },
-            {
-                name: '透明圆圈',
-                type: 'pie',
-                radius: [8, 28],
-                center: ['73%', '80%'],
-                itemStyle: {
-                    color: 'rgba(250, 250, 250, 0.3)',
-                },
-                data: [
-                    {value: 5, name: ''}
+                    {value: 8, name: ''}
                 ]
             }
         ]
@@ -844,19 +832,19 @@
                 // return params.seriesName + '<br/>' + params.name + ' : ' + params.data[2] + '人';
                 return "所在地: " + params.data.continent + "</br>" +
                     "国家: " + params.data.name + "</br>" +
-                    "累计确诊: " + params.data.confirm + "</br>" +
-                    "较昨日确诊: " + (params.data.confirm_add > 0 ? '+' + params.data.confirm_add : params.data.confirm_add) + "</br>" +
-                    "累计死亡: " + params.data.dead + "</br>" +
-                    "较昨日死亡: " + (params.data.dead_compare > 0 ? '+' + params.data.dead_compare : params.data.dead_compare) + "</br>" +
-                    "累计治愈: " + params.data.heal + "</br>" +
-                    "较昨日治愈: " + (params.data.heal_compare > 0 ? '+' + params.data.heal_compare : params.data.heal_compare) + "</br>" +
                     "现有确诊: " + params.data.now_confirm + "</br>" +
+                    "累计确诊: " + params.data.confirm + "</br>" +
+                    "累计死亡: " + params.data.dead + "</br>" +
+                    "累计治愈: " + params.data.heal + "</br>" +
+                    "较昨日确诊: " + (params.data.confirm_add > 0 ? '+' + params.data.confirm_add : params.data.confirm_add) + "</br>" +
+                    "较昨日死亡: " + (params.data.dead_compare > 0 ? '+' + params.data.dead_compare : params.data.dead_compare) + "</br>" +
+                    "较昨日治愈: " + (params.data.heal_compare > 0 ? '+' + params.data.heal_compare : params.data.heal_compare) + "</br>" +
                     "较昨日现有确诊: " + (params.data.now_confirm_compare > 0 ? '+' + params.data.now_confirm_compare : params.data.now_confirm_compare);
             }
         },
         visualMap: {
             min: 0,
-            max: 50000000,
+            max: 5000000,
             text: ['High', 'Low'],
             realtime: false,
             calculable: false,

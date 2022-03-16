@@ -40,8 +40,6 @@
 
             var indexes = sections.getElementsByClassName("index")
             var aSection = sections.getElementsByClassName("aSection")
-            console.log(indexes.length)
-            console.log(aSection.length)
 
             for (var i = 0; i < indexes.length; i++) {
                 indexes[i].index = i;
@@ -139,8 +137,10 @@
             <div class="column">
                 <!-- 上模块 -->
                 <div class="no">
-                    <div class="no-hd">
+                    <div class="no-hd no-hd-china">
                         <ul>
+                            <li></li>
+                            <li></li>
                             <li></li>
                             <li></li>
                         </ul>
@@ -149,6 +149,8 @@
                         <ul>
                             <li>累计确诊人数</li>
                             <li>累计治愈人数</li>
+                            <li>现有确诊</li>
+                            <li>累计死亡</li>
                         </ul>
                     </div>
                 </div>
@@ -178,9 +180,12 @@
             <!-- 左 -->
             <div class="column">
                 <div class="panel bl provinceBar">
-                    <h2>各城市累计确诊分布</h2>
-                    <div class="chart"></div>
-                    <div class="panelFooter"></div>
+{#                    <h2>各城市累计确诊分布</h2>#}
+{#                    <div class="chart"></div>#}
+{#                    <div class="panelFooter"></div>#}
+                    <select name="province" id="province"></select>
+                    <select name="city" id="city"></select>
+                    <button onclick="buttonClick()" type="submit" id = "city-submit">确认</button>
                 </div>
                 <div class="panel bl provinceLine">
                     <h2>城市疫情数据趋势</h2>
@@ -285,44 +290,13 @@
 <script src="../static/js/flexible.js"></script>
 <script src="../static/js/map/world.js"></script>
 <script src="../static/js/map/china.js"></script>
-<script src="../static/js/map/province/黑龙江省.json"></script>
+
 
 {#<script src="../static/js/echarts.min.js"></script>#}
 <!--     <script src="js/arcgis.js"></script> -->
 <script src="../static/js/index.js"></script>
 <script src="../static/js/china-chart.js"></script>
 <script src="../static/js/province-chart.js"></script>
-
-<script>
-    // 全球疫情地图
-    let res1, res2
-    $.ajax({
-        url: 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5',
-        type: 'get',
-        // data: {},
-        dataType: 'jsonp',
-    })
-        .then((data) => {
-            var res = data.data || "";
-            // console.log(JSON.parse(res).chinaTotal.heal)
-            res1 = JSON.parse(res).chinaTotal.confirm;
-            res2 = JSON.parse(res).chinaTotal.heal;
-            return $.ajax({
-                url: 'https://api.inews.qq.com/newsqa/v1/automation/modules/list?modules=FAutoCountryConfirmAdd,WomWorld,WomAboard',
-                type: 'get',
-                // data: {},
-                dataType: 'json',
-            })
-        })
-        .then((data) => {
-            // console.log(data)
-            let sum = data.data.WomWorld.confirm + res1
-            let cureSum = data.data.WomWorld.heal + res2
-            $(".no-hd li:first").text(sum)
-            $(".no-hd li:nth-child(2)").text(cureSum)
-        })
-
-</script>
 </body>
 
 </html>

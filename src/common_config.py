@@ -38,3 +38,7 @@ region_map = {
     "青海": "西北地区",
     "宁夏": "西北地区"
 }
+
+special_province = ["香港", "澳门", "台湾"]
+
+special_cities = ["境外输入", "地区待确认"]

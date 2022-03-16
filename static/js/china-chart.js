@@ -1,18 +1,18 @@
-// //中国疫情数据
-// var china = function () {
-//     $.ajax({
-//         url: 'http://127.0.0.1:5000/china/map',
-//         type: 'get',
-//         // data: {},
-//         dataType: 'jsonp',
-//         success: function (data) {
-//             console.log(data.confirm)
-//             return data.confirm
-//         }
-//     })
-// };
-//
-//
+// 中间累计数据
+(function () {
+    $.ajax({
+        url: 'http://127.0.0.1:5000/china/total',
+        type: 'get',
+        // data: {},
+        dataType: 'json',
+    }).then((data) => {
+        $(".no-hd-china li:first").text(data.confirm)
+        $(".no-hd-china li:nth-child(2)").text(data.heal)
+        $(".no-hd-china li:nth-child(3)").text(data.now_confirm)
+        $(".no-hd-china li:nth-child(4)").text(data.dead)
+    })
+})();
+
 // 1、各地区累计确诊分布
 (function () {
     //初识化ECharts
@@ -31,7 +31,7 @@
         },
         calculable: true,
         series: [{
-            name: '各地区累计确诊',
+            name: '累计确诊',
             type: 'pie',
             radius: [20, 70],
             center: ['50%', '50%'],
@@ -84,20 +84,20 @@
             trigger: 'item',
             // formatter: '{a} <br/>{c} ({d}%)'
             formatter: function (params) {
-                return params.data[0] + "</br>" +
-                    "累计确诊: " + params.data[1] + "</br>" +
-                    "累计治愈: " + params.data[2] + "</br>" +
-                    "累计死亡: " + params.data[3] + "</br>" +
-                    "现有确诊: " + params.data[4] + "</br>" +
-                    "较昨日确诊: " + (params.data[5] > 0 ? '+' + params.data[5] : params.data[5]) + "</br>";
+                return params.data.name + "</br>" +
+                    "累计确诊: " + params.data.confirm + "</br>" +
+                    "累计治愈: " + params.data.heal + "</br>" +
+                    "累计死亡: " + params.data.dead + "</br>" +
+                    "现有确诊: " + params.data.now_confirm + "</br>" +
+                    "较昨日确诊: " + (params.data.confirm_compare > 0 ? '+' + params.data.confirm_compare : params.data.confirm_compare) + "</br>";
             }
         },
         series: [{
             name: '累计确诊',
             type: 'pie',
             clockWise: false,
-            radius: [30, 460],
-            center: ['73%', '80%'],
+            radius: [70, 450],
+            center: ['70%', '70%'],
             roseType: 'area',
             // encode: {
             //     itemName: 'name',
@@ -121,36 +121,23 @@
                         },
                         //注意这里大小写敏感
                         formatter: function (params) {
-                            return params.data[0]
+                            return params.data.name
                         },
 
                     },
                 },
             },
-
         },
             {
                 name: '透明圆圈',
                 type: 'pie',
-                radius: [8, 20],
-                center: ['73%', '80%'],
+                radius: [0, 70],
+                center: ['70%', '70%'],
                 itemStyle: {
                     color: 'rgba(250, 250, 250, 0.3)',
                 },
                 data: [
-                    {value: 5, name: ''}
-                ]
-            },
-            {
-                name: '透明圆圈',
-                type: 'pie',
-                radius: [8, 28],
-                center: ['73%', '80%'],
-                itemStyle: {
-                    color: 'rgba(250, 250, 250, 0.3)',
-                },
-                data: [
-                    {value: 5, name: ''}
+                    {value: 8, name: ''}
                 ]
             }
         ]
@@ -168,7 +155,14 @@
         dataType: 'json',
         success: function (data) {
             data.forEach(item => {
-                virus.push([item.name, item.confirm, item.heal, item.dead, item.now_confirm, item.confirm_compare])
+                virus.push({
+                    "name": item.name,
+                    "confirm": item.confirm,
+                    "heal": item.heal,
+                    "dead": item.dead,
+                    "now_confirm": item.now_confirm,
+                    "confirm_compare": item.confirm_compare
+                })
             })
             //必须在这里在设置一遍，这里涉及到的问题不太懂，只知道如不再设置，而在ajax外赋值是没有作用的
             myChart.setOption({ //加载数据图表
@@ -557,7 +551,7 @@
     var suspectCompareCount = []
     var nowSevereCompareCount = []
     var date = []
-    //  全球疫情趋势
+    //  国内较昨日疫情趋势
     $.ajax({
         url: 'http://127.0.0.1:5000/china/daily',
         type: 'get',
@@ -621,10 +615,10 @@
                 // var value = params.value + '';
                 // return params.seriesName + '<br/>' + params.name + ' : ' + params.data[2] + '人';
                 return params.data.name + "</br>" +
+                    "现有确诊: " + params.data.now_confirm + "</br>" +
                     "累计确诊: " + params.data.confirm + "</br>" +
                     "累计治愈: " + params.data.heal + "</br>" +
                     "累计死亡: " + params.data.dead + "</br>" +
-                    "现有确诊: " + params.data.now_confirm + "</br>" +
                     "较昨日确诊: " + (params.data.confirm_compare > 0 ? '+' + params.data.confirm_compare : params.data.confirm_compare);
             }
         },
