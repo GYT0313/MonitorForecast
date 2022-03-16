@@ -77,16 +77,14 @@ function buttonClick() {
         "重庆": "市",
     }
     // 拼接
-    console.log(provinceName)
-    console.log(specialMap[provinceName])
     provinceName = specialMap[provinceName] != null ? provinceName + specialMap[provinceName] : provinceName + "省";
 
     $.get('../static/js/map/province/' + provinceName + '.json', function (mapJson) {
-        echarts.registerMap("黑龙江", mapJson)
+        echarts.registerMap(provinceName, mapJson)
         var myChart = echarts.init(document.querySelector('.provinceMap .chart'))
         var option = {
             title: {
-                text: '黑龙江各城市确诊情况',
+                text: provinceName + '各城市确诊情况',
                 // subtext: '累计确诊人数',
                 left: 'center',
                 textStyle: {
@@ -108,7 +106,7 @@ function buttonClick() {
             visualMap: {
                 show: true,
                 min: 0,
-                max: 100,
+                max: 150,
                 text: ['High', 'Low'],
                 realtime: false,
                 calculable: false,
@@ -121,7 +119,7 @@ function buttonClick() {
                 {
                     name: '累计确诊人数',
                     type: 'map',
-                    mapType: '黑龙江',
+                    mapType: provinceName,
                     roam: true,
                     itemStyle: {
                         normal: {

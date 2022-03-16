@@ -119,6 +119,7 @@
 
     <!--国内-->
     <div class="aSection" style="display: none">
+        <button type="submit" onclick="chinaClick()">刷新</button>
         <section class="mainbox">
             <!-- 左 -->
             <div class="column">
@@ -184,7 +185,7 @@
 {#                    <div class="chart"></div>#}
 {#                    <div class="panelFooter"></div>#}
                     <select name="province" id="province"></select>
-                    <select name="city" id="city"></select>
+                    <select name="city" id="city" hidden="hidden"></select>
                     <button onclick="buttonClick()" type="submit" id = "city-submit">确认</button>
                 </div>
                 <div class="panel bl provinceLine">
