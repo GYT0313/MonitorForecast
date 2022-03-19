@@ -14,7 +14,7 @@ function chinaClick() {
         })
     })();
 
-// 1、各地区累计确诊分布
+// 1、各地区累计确诊分布（饼图）
     (function () {
         //初识化ECharts
         var myChart = echarts.init(document.querySelector(".chinaBar .chart"));
@@ -70,7 +70,7 @@ function chinaClick() {
     })();
 
 
-// 2、各省疫情确诊情况前十五
+// 2、各省疫情确诊情况前十五（丁格尔玫瑰图）
     (function () {
         // 基于准备好的dom，初始化echarts实例
         var myChart = echarts.init(document.querySelector(".chinaBar1 .chart"));
@@ -180,7 +180,7 @@ function chinaClick() {
     })();
 
 
-// 3、国内较昨日数据变化趋势
+// 3、国内较昨日数据变化趋势（折线图）
     (function () {
         var myChart = echarts.init(document.querySelector('.chinaLine .chart'))
         var option = {
@@ -597,7 +597,7 @@ function chinaClick() {
     })();
 
 
-// 4、国内各省疫情地图
+// 4、国内各省疫情地图（地图）
     (function () {
         var myChart = echarts.init(document.querySelector('.chinaMap .chart'))
         var option = {

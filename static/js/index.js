@@ -8,13 +8,13 @@
     }).then((data) => {
         let sum = data.confirm
         let cureSum = data.heal
-        $(".no-hd li:first").text(sum)
-        $(".no-hd li:nth-child(2)").text(cureSum)
+        $(".no-hd-global li:first").text(sum)
+        $(".no-hd-global li:nth-child(2)").text(cureSum)
     })
 })();
 
 
-// 1、各大洲累计确诊分布(不包含国内)
+// 1、各大洲累计确诊分布(不包含国内)（饼图）
 (function () {
     //初识化ECharts
     var myChart = echarts.init(document.querySelector(".bar .chart"));
@@ -70,7 +70,7 @@
 })();
 
 
-// 2、世界疫情确诊情况前十五
+// 2、世界疫情确诊情况前十五（丁格尔玫瑰图）
 (function () {
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.querySelector(".bar1 .chart"));
@@ -179,7 +179,7 @@
 })();
 
 
-// 3、全球疫情数据趋势(不包含国内)
+// 3、全球疫情数据趋势(不包含国内)（折线图）
 (function () {
     var myChart = echarts.init(document.querySelector('.line .chart'))
     var option = {
@@ -596,7 +596,7 @@
 })();
 
 
-// 4、全球疫情地图
+// 4、全球疫情地图（地图）
 (function () {
     var myChart = echarts.init(document.querySelector('.map .chart'))
     var nameMap = {

@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-import json
 from datetime import timedelta
 
 import pymysql
@@ -10,6 +9,7 @@ from flask_apscheduler import APScheduler
 from flask_sqlalchemy import SQLAlchemy
 
 from src import database_config, tencent_request_service, db_request_service
+from common_util import *
 
 pymysql.install_as_MySQLdb()
 
@@ -102,25 +102,6 @@ def china_province():
     return db_request_service.get_china_province(ChinaTotal, ChinaProvince)
 
 
-@app.route('/china/all/city', methods=['GET'])
-def china_all_city():
-    """
-    国内各省数据
-    :return:
-    """
-    return db_request_service.get_china_all_city(ChinaTotal, ChinaProvince, ChinaCity)
-
-
-@app.route('/china/city', methods=['POST'])
-def china_city():
-    """
-    根据省份查询城市数据
-    :return:
-    """
-    china_province_id = json.loads(request.data)['china_province_id']
-    return db_request_service.get_china_city_by_province_id(ChinaCity, china_province_id)
-
-
 @app.route('/china/daily', methods=['GET'])
 def china_compare_daily():
     """
@@ -148,16 +129,7 @@ def china_region():
     return db_request_service.get_china_region(ChinaTotal, ChinaProvince)
 
 
-@app.route('/china/province/city', methods=['GET'])
-def china_province_of_city():
-    """
-    根据省名获取城市数据
-    :return:
-    """
-    params = request.args.to_dict()
-    return db_request_service.get_china_province_of_city(ChinaTotal, ChinaProvince, ChinaCity, params);
-
-
+# ###############################城市################################
 @app.route('/china/province/city/json', methods=['GET'])
 def china_province_of_city_json():
     """
@@ -167,11 +139,62 @@ def china_province_of_city_json():
     return db_request_service.get_china_province_of_city_json(ChinaTotal, ChinaProvince, ChinaCity)
 
 
+@app.route('/china/province/city', methods=['GET'])
+def china_province_of_city():
+    """
+    根据省名获取城市数据
+    :return:
+    """
+    params = request.args.to_dict()
+    return db_request_service.get_china_province_of_city(ChinaTotal, ChinaProvince, ChinaCity, params)
+
+
+@app.route('/china/province/daily', methods=['GET'])
+def china_province_daily():
+    """
+    省份每日数据趋势
+    :return:
+    """
+    province_name = request.args.to_dict()['province']
+    return db_request_service.get_province_daily(ChinaProvince, province_name)
+
+
+@app.route('/china/province/city/head', methods=['GET'])
+def china_province_city_head_fifteen():
+    """
+    根据省份名称查询累计确诊数前五的城市
+    :return:
+    """
+    params = request.args.to_dict()
+    return db_request_service.china_province_city_head_fifteen(ChinaTotal, ChinaProvince, ChinaCity, params)
+
+
+@app.route('/china/province/new', methods=['GET'])
+def china_province_by_name():
+    """
+    根据省份名称获取最新的数据
+    :return:
+    """
+    province_name = request.args.to_dict()['province']
+    return db_request_service.get_china_province_by_name(ChinaTotal, ChinaProvince, province_name)
+
+
+# ##############
 @app.route('/pull', methods=['GET'])
 def pull():
-    Jobs.pull_global()
-    Jobs.pull_china()
-    return '<h3>Pull global and china data success!</h3>'
+    """
+    调用接口进行手动数据更新
+    :return:
+    """
+    global_str = "<h1 style='color: green; text-align: center'>全球数据-已更新!</h1>"
+    china_str = "<h1 style='color: green; text-align: center'>国内数据-已更新!</h1>"
+    global_is_add_or_update = Jobs.pull_global()
+    if global_is_add_or_update is False:
+        global_str = "<h1 style='color: orange; text-align: center'>全球数据-无更新!</h1>"
+    china_is_add_or_update = Jobs.pull_china()
+    if china_is_add_or_update is False:
+        china_str = "<h1 style='color: orange; text-align: center'>国内数据-无更新!</h1>"
+    return global_str + china_str
 
 
 @app.errorhandler(Exception)
@@ -193,11 +216,13 @@ class Jobs(object):
         从腾讯API拉取全球数据并保持
         :return:
         """
-        tencent_request_service.save_global_data(
+        is_add_or_update = tencent_request_service.save_global_data(
             db=db,
             GlobalWomWorld=GlobalWomWorld,
             GlobalWomAboard=GlobalWomAboard,
             GlobalDaily=GlobalDaily)
+        db.session.close()
+        return is_add_or_update
 
     @staticmethod
     def pull_china():
@@ -205,12 +230,14 @@ class Jobs(object):
         从腾讯API拉取国内数据并保持
         :return:
         """
-        tencent_request_service.save_china(
+        is_add_or_update = tencent_request_service.save_china(
             db,
             ChinaTotal=ChinaTotal,
             ChinaCompareDaily=ChinaCompareDaily,
             ChinaProvince=ChinaProvince,
             ChinaCity=ChinaCity)
+        db.session.close()
+        return is_add_or_update
 
 
 def app_init():
@@ -252,6 +279,7 @@ class GlobalWomWorld(db.Model):
     death_rate = db.Column(db.FLOAT, comment='死亡率')
     cure_rate = db.Column(db.FLOAT, comment='治愈率')
     last_update_time = db.Column(db.DateTime, comment='上次更新时间', unique=True)
+    date_time = db.Column(db.DateTime, comment='当前数据所在年-月-日', unique=True)
 
     def __self_dict__(self):
         """
@@ -270,7 +298,8 @@ class GlobalWomWorld(db.Model):
             'dead_add': self.dead_add,
             'death_rate': self.death_rate,
             'cure_rate': self.cure_rate,
-            'last_update_time': self.last_update_time
+            'last_update_time': str(self.last_update_time),
+            'date_time': str(self.date_time)
         }
 
 
@@ -364,6 +393,7 @@ class ChinaTotal(db.Model):
     suspect = db.Column(db.BigInteger, comment='现有疑似')
     now_severe = db.Column(db.BigInteger, comment='现有重症')
     last_update_time = db.Column(db.DateTime, comment='上次更新时间', unique=True)
+    date_time = db.Column(db.DateTime, comment='数据时间', unique=True)
 
     def __self_dict__(self):
         """
@@ -378,7 +408,8 @@ class ChinaTotal(db.Model):
             'now_confirm': self.now_confirm,
             'suspect': self.suspect,
             'now_severe': self.now_severe,
-            'last_update_time': self.last_update_time
+            'last_update_time': str(self.last_update_time),
+            'date_time': str(self.date_time)
         }
 
 
@@ -417,7 +448,7 @@ class ChinaCompareDaily(db.Model):
             'now_confirm_compare': self.now_confirm_compare,
             'suspect_compare': self.suspect_compare,
             'now_severe_compare': self.now_severe_compare,
-            'date_time': self.date_time,
+            'date_time': str(self.date_time),
             'china_total_id': self.china_total_id
         }
 
@@ -438,6 +469,8 @@ class ChinaProvince(db.Model):
         db.Integer,
         db.ForeignKey('t_china_total.id'),
         comment='外键到同一时间的国内总数据id')
+    # 使用此字段可以直接查询外键关联的china_total
+    china_total = db.relationship('ChinaTotal', backref=db.backref('provinces'))
 
     __table_args__ = (
         db.UniqueConstraint('name', 'china_total_id', name='uk_name_china_total_id'),
@@ -456,7 +489,8 @@ class ChinaProvince(db.Model):
             'dead': self.dead,
             'now_confirm': self.now_confirm,
             'confirm_compare': self.confirm_compare,
-            'china_total_id': self.china_total_id
+            'china_total_id': self.china_total_id,
+            'date_time': get_date_by_standard_time(str(self.china_total.date_time))
         }
 
 
@@ -516,11 +550,12 @@ if __name__ == '__main__':
 
     # app初始化
     app_init()
+    # MySQL表初始化
     # table_init()
 
     # 添加定时任务
-    schedule.add_job(id='pull_global', func=Jobs.pull_global, trigger='interval', minutes=30)
-    schedule.add_job(id='pull_china', func=Jobs.pull_china, trigger='interval', minutes=30)
+    schedule.add_job(id='pull_global', func=Jobs.pull_global, trigger='interval', minutes=10)
+    schedule.add_job(id='pull_china', func=Jobs.pull_china, trigger='interval', minutes=10)
     schedule.start()
 
     app.run(debug=True, use_reloader=False)

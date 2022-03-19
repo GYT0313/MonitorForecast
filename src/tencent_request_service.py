@@ -64,12 +64,15 @@ def save_global_data(db, GlobalWomWorld, GlobalWomAboard, GlobalDaily):
     保存全球疫情相关数据到MySQL
     :return:
     """
-    is_add = save_global_world_and_aboard(db=db, GlobalWomWorld=GlobalWomWorld, GlobalWomAboard=GlobalWomAboard)
-    if is_add:
+    is_add_or_update = save_global_world_and_aboard(db=db, GlobalWomWorld=GlobalWomWorld,
+                                                    GlobalWomAboard=GlobalWomAboard)
+    if is_add_or_update:
         save_global_daily(db=db, GlobalDaily=GlobalDaily)
-        print('全球数据已更新.')
+        print('全球数据-已更新.')
+        return True
     else:
-        print('全球数据未更新.')
+        print('全球数据-未更新.')
+        return False
 
 
 def save_global_world_and_aboard(db, GlobalWomWorld, GlobalWomAboard):
@@ -78,11 +81,11 @@ def save_global_world_and_aboard(db, GlobalWomWorld, GlobalWomAboard):
     :return:
     """
     data = json.loads(request_global_data_url())
-    is_add = save_global_wom_world(db, GlobalWomWorld, data)
-    # 如果全球数据新增了, 才进行各国、daily数据添加
-    if is_add:
+    is_add_or_update = save_global_wom_world(db, GlobalWomWorld, data)
+    # 如果全球数据新增或更新了, 才进行各国、daily数据添加
+    if is_add_or_update:
         save_global_wom_aboard(db, GlobalWomAboard, data, get_most_new_data_by_last_update_time(GlobalWomWorld).id)
-    return is_add
+    return is_add_or_update
 
 
 def save_global_daily(db, GlobalDaily):
@@ -110,9 +113,8 @@ def save_global_daily(db, GlobalDaily):
             else:
                 db.session.add(global_daily)
         db.session.commit()
-        db.session.close()
     except BaseException:
-        # 全球疫情数据只更新到了2021年9月1日，所以重复时不回归，也不抛出异常
+        # 全球疫情数据只更新到了2021年9月1日，所以重复时不回滚，也不抛出异常
         # db.session.rollback()
         # raise Exception('数据新增异常!')
         pass
@@ -121,7 +123,7 @@ def save_global_daily(db, GlobalDaily):
 def save_global_wom_world(db, GlobalWomWorld, data):
     """
     全球疫情数据汇总保存到MySQL
-    :return: 是否是添加: 是-True, 否-False
+    :return: 是否是添加或更新了数据: 是-True, 否-False
     """
     try:
         wom_world = data.get('data').get('WomWorld')
@@ -136,22 +138,30 @@ def save_global_wom_world(db, GlobalWomWorld, data):
             dead_add=wom_world.get("deadAdd"),
             death_rate=wom_world.get("deathrate"),
             cure_rate=wom_world.get("curerate"),
-            last_update_time=wom_world.get("lastUpdateTime"))
-        # 如果存在不做操作, 否则添加
-        data_in_mysql_list = GlobalWomWorld.query.filter(
-            GlobalWomWorld.last_update_time == wom_world.get("lastUpdateTime")).all()
-        # <=0 表示没有此数据
-        if len(data_in_mysql_list) <= 0:
-            db.session.add(global_wom_world)
+            last_update_time=wom_world.get("lastUpdateTime"),
+            date_time=get_date_by_last_update_time(wom_world.get("lastUpdateTime")))
+        # 为实现每天数据只有一条记录: 如果存在年-月-日相等, 并且时-分-秒不相等的数据，存在则更新, 否则添加
+        # 根据年-月-日查询是否有今日的数据
+        is_add_or_update = True
+        has_today_data = GlobalWomWorld.query.filter(
+            GlobalWomWorld.date_time == get_date_by_last_update_time(wom_world.get("lastUpdateTime"))).all()
+        # 如果存在今日数据，判断是否时-分-秒相等，如果不相同则更新
+        if len(has_today_data) > 0:
+            is_update_num = GlobalWomWorld.query.filter(
+                and_(GlobalWomWorld.date_time == get_date_by_last_update_time(wom_world.get("lastUpdateTime")),
+                     GlobalWomWorld.last_update_time != wom_world.get("lastUpdateTime"))).update(
+                pop_id_and_date_time(global_wom_world.__self_dict__()))
+            # 如果返回值>0 表示进行数据的更新, 如果<=0，表示此数据没有变化, 不更新也不新增
+            if is_update_num <= 0:
+                is_add_or_update = False
         else:
-            return False
+            db.session.add(global_wom_world)
 
         db.session.commit()
-        db.session.close()
-        return True
+        return is_add_or_update
     except BaseException:
         db.session.rollback()
-        raise Exception('数据新增异常!')
+        raise Exception('全球数据新增异常!')
 
 
 def save_global_wom_aboard(db, GlobalWomAboard, data, global_wom_world_id):
@@ -174,20 +184,20 @@ def save_global_wom_aboard(db, GlobalWomAboard, data, global_wom_world_id):
                 now_confirm=wom_aboard.get("nowConfirm"),
                 now_confirm_compare=wom_aboard.get("nowConfirmCompare"),
                 global_wom_world_id=global_wom_world_id
-
             )
-            # 如果存在不做操作, 否则添加
-            data_in_mysql_list = GlobalWomAboard.query.filter(
+            # 如果存在则更新
+            is_update_num = GlobalWomAboard.query.filter(
                 and_(GlobalWomAboard.name == wom_aboard.get("name"),
-                     GlobalWomAboard.global_wom_world_id == global_wom_world_id)).all()
-            if len(data_in_mysql_list) <= 0:
+                     GlobalWomAboard.global_wom_world_id == global_wom_world_id)).update(
+                pop_id(global_wom_aboard.__self_dict__()))
+            # 否则新增
+            if is_update_num <= 0:
                 db.session.add(global_wom_aboard)
 
         db.session.commit()
-        db.session.close()
     except BaseException:
         db.session.rollback()
-        raise Exception('数据新增异常!')
+        raise Exception('全球数据新增异常!')
 
 
 # ##############################################国内数据#################################################################
@@ -205,10 +215,10 @@ def save_china(db, ChinaTotal, ChinaCompareDaily, ChinaProvince, ChinaCity):
         last_update_time = data.get("lastUpdateTime")
 
         # 国内数据汇总和每日较上日数据变化
-        is_add = save_china_total(db=db, ChinaTotal=ChinaTotal, data=data.get('chinaTotal'),
-                                  last_update_time=last_update_time)
+        is_add_or_update = save_china_total(db=db, ChinaTotal=ChinaTotal, data=data.get('chinaTotal'),
+                                            last_update_time=last_update_time)
         # 如果国内汇总数据更新时间未变化, 不进行其他数据添加
-        if is_add:
+        if is_add_or_update:
             most_new_model_data_id = get_most_new_data_by_last_update_time(ChinaTotal).id
 
             save_china_daily(db=db, ChinaCompareDaily=ChinaCompareDaily, data=data.get('chinaAdd'),
@@ -219,9 +229,11 @@ def save_china(db, ChinaTotal, ChinaCompareDaily, ChinaProvince, ChinaCity):
             save_china_province_or_city(db=db, ChinaProvince=ChinaProvince, ChinaCity=ChinaCity,
                                         province_and_city_list=province_and_city_list,
                                         china_total_id=most_new_model_data_id)
-            print('国内数据已更新.')
+            print('国内数据-已更新.')
+            return True
         else:
-            print('国内数据未更新.')
+            print('国内数据-未更新.')
+            return False
     else:
         print("国内请求API没有数据")
 
@@ -239,21 +251,31 @@ def save_china_total(db, ChinaTotal, data, last_update_time):
             now_confirm=data.get("nowConfirm"),
             suspect=data.get("suspect"),
             now_severe=data.get("nowSevere"),
-            last_update_time=last_update_time
+            last_update_time=last_update_time,
+            date_time=get_date_by_last_update_time(last_update_time)
         )
-        # 如果存在不做操作, 否则添加
-        data_in_mysql_list = ChinaTotal.query.filter(ChinaTotal.last_update_time == last_update_time).all()
-        if len(data_in_mysql_list) <= 0:
-            db.session.add(china_total)
+        # 为实现每天数据只有一条记录: 如果存在年-月-日相等, 并且时-分-秒不相等的数据，存在则更新, 否则添加
+        # 根据年-月-日查询是否有今日的数据
+        is_add_or_update = True
+        has_today_data = ChinaTotal.query.filter(
+            ChinaTotal.date_time == get_date_by_last_update_time(last_update_time)).all()
+        # 如果存在今日数据，判断是否时-分-秒相等，如果不相同则更新
+        if len(has_today_data) > 0:
+            is_update_num = ChinaTotal.query.filter(
+                and_(ChinaTotal.date_time == get_date_by_last_update_time(last_update_time),
+                     ChinaTotal.last_update_time != last_update_time)).update(
+                pop_id_and_date_time(china_total.__self_dict__()))
+            # 如果返回值>0 表示进行数据的更新, 如果<=0，表示此数据没有变化, 不更新也不新增
+            if is_update_num <= 0:
+                is_add_or_update = False
         else:
-            return False
+            db.session.add(china_total)
 
         db.session.commit()
-        db.session.close()
-        return True
+        return is_add_or_update
     except BaseException:
         db.session.rollback()
-        raise Exception('数据新增异常!')
+        raise Exception('国内汇总数据新增异常!')
 
 
 def save_china_daily(db, ChinaCompareDaily, data, date_time, china_total_id):
@@ -273,18 +295,14 @@ def save_china_daily(db, ChinaCompareDaily, data, date_time, china_total_id):
             china_total_id=china_total_id
         )
         # 如果存在则更新, 否则添加
-        no_id_dict = china_compare_daily.__self_dict__()
-        no_id_dict.pop('id')
-        is_update = ChinaCompareDaily.query.filter(
-            and_(ChinaCompareDaily.date_time == date_time)).update(
-            no_id_dict)
-        if is_update <= 0:
+        is_update_num = ChinaCompareDaily.query.filter(
+            and_(ChinaCompareDaily.date_time == date_time)).update(pop_id(china_compare_daily.__self_dict__()))
+        if is_update_num <= 0:
             db.session.add(china_compare_daily)
         db.session.commit()
-        db.session.close()
     except BaseException:
         db.session.rollback()
-        raise Exception('数据新增异常!')
+        raise Exception('国内每日数据变化新增异常!')
 
 
 def save_china_province_or_city(db, ChinaProvince, ChinaCity, province_and_city_list, china_total_id):
@@ -310,10 +328,12 @@ def save_china_province_or_city(db, ChinaProvince, ChinaCity, province_and_city_
                 confirm_compare=today.get("confirm"),
                 china_total_id=china_total_id
             )
-            # 如果存在不做操作, 否则添加
-            data_in_mysql_list = ChinaProvince.query.filter(
-                and_(ChinaProvince.name == name, ChinaProvince.china_total_id == china_total_id)).all()
-            if len(data_in_mysql_list) <= 0:
+            # 如果存在则更新
+            is_update_num = ChinaProvince.query.filter(
+                and_(ChinaProvince.name == name, ChinaProvince.china_total_id == china_total_id)).update(
+                pop_id(china_province.__self_dict__()))
+            # 否则新增
+            if is_update_num <= 0:
                 db.session.add(china_province)
             db.session.commit()
 
@@ -335,12 +355,13 @@ def save_china_province_or_city(db, ChinaProvince, ChinaCity, province_and_city_
                 confirm_compare=today.get("confirm"),
                 china_province_id=china_province_id
             )
-            # 如果存在不做操作, 否则添加
-            data_in_mysql_list = ChinaCity.query.filter(
-                and_(ChinaCity.name == name, ChinaCity.china_province_id == china_province_id)).all()
-            if len(data_in_mysql_list) <= 0:
+            # 如果存在则更新
+            is_update_num = ChinaCity.query.filter(
+                and_(ChinaCity.name == name, ChinaCity.china_province_id == china_province_id)).update(
+                pop_id(china_city.__self_dict__()))
+            # 否则新增
+            if is_update_num <= 0:
                 db.session.add(china_city)
-                db.session.commit()
 
         for province_and_city_data in province_and_city_list:
             # 省
@@ -357,10 +378,9 @@ def save_china_province_or_city(db, ChinaProvince, ChinaCity, province_and_city_
                               china_total_id).id)
 
         db.session.commit()
-        db.session.close()
     except BaseException:
         db.session.rollback()
-        raise Exception('数据新增异常!')
+        raise Exception('国内省、城市数据新增异常!')
 
 
 def request(url):
@@ -388,3 +408,22 @@ def get_date_by_last_update_time(last_update_time):
     """
     return datetime.strptime(last_update_time, '%Y-%m-%d %H:%M:%S').date().__str__()
 
+
+def pop_id_and_date_time(data_dict):
+    """
+    把id、date_time字段去除
+    :param dat_dict:
+    :return:
+    """
+    data_dict.pop('id')
+    data_dict.pop('date_time')
+    return data_dict
+
+
+def pop_id(data_dict):
+    """
+    把id字段去除
+    :return:
+    """
+    data_dict.pop('id')
+    return data_dict

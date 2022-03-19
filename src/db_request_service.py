@@ -176,28 +176,13 @@ def get_china_all_city(ChinaTotal, ChinaProvince, ChinaCity):
                                    ChinaCity.china_province_id.in_(province_id_list)).all())), ensure_ascii=False)
 
 
-def get_china_city_by_province_id(ChinaCity, china_province_id):
-    """
-    根据省份id获取最新的城市数据
-    :return:
-    """
-    return json.dumps(list(map(lambda x: x.__self_dict__(),
-                               ChinaCity.query.filter(
-                                   and_(ChinaCity.china_province_id == china_province_id)).all())), ensure_ascii=False)
-
-
 def get_china_compare_daily(ChinaCompareDaily):
     """
     获取国内较昨日疫情变化趋势数据
     :param ChinaCompareDaily:
     :return:
     """
-    # 将datetime 转为 str
-    result = []
-    for item in list(map(lambda x: x.__self_dict__(), ChinaCompareDaily.query.all())):
-        item['date_time'] = str(item['date_time'].date())
-        result.append(item)
-    return json.dumps(result, ensure_ascii=False)
+    return json.dumps(list(map(lambda x: x.__self_dict__(), ChinaCompareDaily.query.all())), ensure_ascii=False)
 
 
 def get_china_province_head_fifteen(ChinaTotal, ChinaProvince):
@@ -271,3 +256,38 @@ def get_china_province_of_city_json(ChinaTotal, ChinaProvince, ChinaCity):
     return json.dumps({
         "provinces": result
     }, ensure_ascii=False)
+
+
+def get_province_daily(ChinaProvince, province_name):
+    """
+    省份每日数据变化趋势
+    :param ChinaProvince:
+    :param province_name:
+    :return:
+    """
+    return json.dumps(
+        list(map(lambda x: x.__self_dict__(), ChinaProvince.query.filter(ChinaProvince.name == province_name).all())))
+
+
+def china_province_city_head_fifteen(ChinaTotal, ChinaProvince, ChinaCity, params):
+    """
+    根据省份名称查询累计确诊数前五的城市
+    :return:
+    """
+    cities_dict = get_china_province_of_city(ChinaTotal, ChinaProvince, ChinaCity, params)
+    return pd.DataFrame(json.loads(cities_dict)).sort_values(by="confirm", ascending=False)[:15].to_json(
+        orient='records')
+
+
+def get_china_province_by_name(ChinaTotal, ChinaProvince, province_name):
+    """
+    根据省份名称获取最新的数据
+    :param ChinaTotal:
+    :param ChinaProvince:
+    :param province_name:
+    :return:
+    """
+    most_new_china_total = get_most_new_data_by_last_update_time(ChinaTotal)
+    return json.dumps(ChinaProvince.query.filter(
+        and_(ChinaProvince.name == province_name,
+             ChinaProvince.china_total_id == most_new_china_total.id)).first().__self_dict__(), ensure_ascii=False)

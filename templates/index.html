@@ -70,12 +70,12 @@
             <!-- 左 -->
             <div class="column">
                 <div class="panel bl bar">
-                    <h2>各大洲累计确诊分布(不包含国内)</h2>
+                    <h2>各大洲累计确诊分布(不含国内)</h2>
                     <div class="chart"></div>
                     <div class="panelFooter"></div>
                 </div>
                 <div class="panel bl line">
-                    <h2>全球疫情数据趋势(不包含国内)</h2>
+                    <h2>全球疫情数据变化趋势(不含国内)</h2>
                     <div class="chart"></div>
                     <div class="panelFooter"></div>
                 </div>
@@ -84,7 +84,7 @@
             <div class="column">
                 <!-- 上模块 -->
                 <div class="no">
-                    <div class="no-hd">
+                    <div class="no-hd no-hd-global">
                         <ul>
                             <li></li>
                             <li></li>
@@ -109,7 +109,7 @@
             <!-- 右 -->
             <div class="column">
                 <div class="panel bl bar1">
-                    <h2>各国累计确诊Top-15(不包含国内)</h2>
+                    <h2>各国累计确诊Top-15(不含国内)</h2>
                     <div class="chart"></div>
                     <div class="panelFooter"></div>
                 </div>
@@ -129,7 +129,7 @@
                     <div class="panelFooter"></div>
                 </div>
                 <div class="panel bl chinaLine">
-                    <h2>国内疫情数据趋势</h2>
+                    <h2>国内疫情数据变化趋势</h2>
                     <div class="chart"></div>
                     <div class="panelFooter"></div>
                 </div>
@@ -186,10 +186,10 @@
 {#                    <div class="panelFooter"></div>#}
                     <select name="province" id="province"></select>
                     <select name="city" id="city" hidden="hidden"></select>
-                    <button onclick="buttonClick()" type="submit" id = "city-submit">确认</button>
+                    <button onclick="buttonClick()" type="submit" id="city-submit">确认</button>
                 </div>
                 <div class="panel bl provinceLine">
-                    <h2>城市疫情数据趋势</h2>
+                    <h2>该省疫情数据变化趋势</h2>
                     <div class="chart"></div>
                     <div class="panelFooter"></div>
                 </div>
@@ -198,8 +198,10 @@
             <div class="column">
                 <!-- 上模块 -->
                 <div class="no">
-                    <div class="no-hd">
+                    <div class="no-hd no-hd-province">
                         <ul>
+                            <li></li>
+                            <li></li>
                             <li></li>
                             <li></li>
                         </ul>
@@ -208,6 +210,8 @@
                         <ul>
                             <li>累计确诊人数</li>
                             <li>累计治愈人数</li>
+                            <li>现有确诊</li>
+                            <li>累计死亡</li>
                         </ul>
                     </div>
                 </div>
@@ -283,8 +287,7 @@
             </div>
         </section>
     </div>
-
-
+    <div class="data">--数据来源于腾讯API</div>
 </div>
 
 <!--布局-->
