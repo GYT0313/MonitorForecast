@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
 import json
-from datetime import datetime
 
 import requests
 from sqlalchemy import and_
 
+from common_util import *
 from db_request_service import get_most_new_data_by_last_update_time, get_province_data_by_name_and_china_total_id
 
 """
@@ -105,7 +105,8 @@ def save_global_daily(db, GlobalDaily):
                 new_add_confirm=all_data.get("newAddConfirm"),
                 dead_rate=all_data.get("deadRate"),
                 heal_rate=all_data.get("healRate"),
-                date_time=date_time)
+                # 字符串不带时:分:秒, 存到MySQL后会带时分秒, 从MySQL取出也会带时:分:秒
+                date_time=get_standard_time_by_date_time(date_time))
             # 全球疫情数据只更新到了2021年9月1日，所以如果已有数据直接break
             has_data_list = GlobalDaily.query.filter(GlobalDaily.date_time == date_time).all()
             if len(has_data_list) != 0:
@@ -139,16 +140,16 @@ def save_global_wom_world(db, GlobalWomWorld, data):
             death_rate=wom_world.get("deathrate"),
             cure_rate=wom_world.get("curerate"),
             last_update_time=wom_world.get("lastUpdateTime"),
-            date_time=get_date_by_last_update_time(wom_world.get("lastUpdateTime")))
+            date_time=get_standard_time_by_date_time(get_date_by_standard_time(wom_world.get("lastUpdateTime"))))
         # 为实现每天数据只有一条记录: 如果存在年-月-日相等, 并且时-分-秒不相等的数据，存在则更新, 否则添加
         # 根据年-月-日查询是否有今日的数据
         is_add_or_update = True
         has_today_data = GlobalWomWorld.query.filter(
-            GlobalWomWorld.date_time == get_date_by_last_update_time(wom_world.get("lastUpdateTime"))).all()
+            GlobalWomWorld.date_time == get_date_by_standard_time(wom_world.get("lastUpdateTime"))).all()
         # 如果存在今日数据，判断是否时-分-秒相等，如果不相同则更新
         if len(has_today_data) > 0:
             is_update_num = GlobalWomWorld.query.filter(
-                and_(GlobalWomWorld.date_time == get_date_by_last_update_time(wom_world.get("lastUpdateTime")),
+                and_(GlobalWomWorld.date_time == get_date_by_standard_time(wom_world.get("lastUpdateTime")),
                      GlobalWomWorld.last_update_time != wom_world.get("lastUpdateTime"))).update(
                 pop_id_and_date_time(global_wom_world.__self_dict__()))
             # 如果返回值>0 表示进行数据的更新, 如果<=0，表示此数据没有变化, 不更新也不新增
@@ -222,7 +223,7 @@ def save_china(db, ChinaTotal, ChinaCompareDaily, ChinaProvince, ChinaCity):
             most_new_model_data_id = get_most_new_data_by_last_update_time(ChinaTotal).id
 
             save_china_daily(db=db, ChinaCompareDaily=ChinaCompareDaily, data=data.get('chinaAdd'),
-                             date_time=get_date_by_last_update_time(last_update_time),
+                             date_time=get_date_by_standard_time(last_update_time),
                              china_total_id=most_new_model_data_id)
             # 省和城市数据
             province_and_city_list = data.get('areaTree')[0].get('children')
@@ -252,17 +253,17 @@ def save_china_total(db, ChinaTotal, data, last_update_time):
             suspect=data.get("suspect"),
             now_severe=data.get("nowSevere"),
             last_update_time=last_update_time,
-            date_time=get_date_by_last_update_time(last_update_time)
+            date_time=get_standard_time_by_date_time(get_date_by_standard_time(last_update_time))
         )
         # 为实现每天数据只有一条记录: 如果存在年-月-日相等, 并且时-分-秒不相等的数据，存在则更新, 否则添加
         # 根据年-月-日查询是否有今日的数据
         is_add_or_update = True
         has_today_data = ChinaTotal.query.filter(
-            ChinaTotal.date_time == get_date_by_last_update_time(last_update_time)).all()
+            ChinaTotal.date_time == get_date_by_standard_time(last_update_time)).all()
         # 如果存在今日数据，判断是否时-分-秒相等，如果不相同则更新
         if len(has_today_data) > 0:
             is_update_num = ChinaTotal.query.filter(
-                and_(ChinaTotal.date_time == get_date_by_last_update_time(last_update_time),
+                and_(ChinaTotal.date_time == get_date_by_standard_time(last_update_time),
                      ChinaTotal.last_update_time != last_update_time)).update(
                 pop_id_and_date_time(china_total.__self_dict__()))
             # 如果返回值>0 表示进行数据的更新, 如果<=0，表示此数据没有变化, 不更新也不新增
@@ -291,7 +292,7 @@ def save_china_daily(db, ChinaCompareDaily, data, date_time, china_total_id):
             now_confirm_compare=data.get("nowConfirm"),
             suspect_compare=data.get("suspect"),
             now_severe_compare=data.get("nowSevere"),
-            date_time=date_time,
+            date_time=get_standard_time_by_date_time(date_time),
             china_total_id=china_total_id
         )
         # 如果存在则更新, 否则添加
@@ -398,15 +399,6 @@ def format_str_date(str_date):
     :return:
     """
     return datetime.strptime(str_date, '%Y %m.%d').date().__str__()
-
-
-def get_date_by_last_update_time(last_update_time):
-    """
-    将last_update_time格式的时间返回年月日
-    :param last_update_time:
-    :return:
-    """
-    return datetime.strptime(last_update_time, '%Y-%m-%d %H:%M:%S').date().__str__()
 
 
 def pop_id_and_date_time(data_dict):

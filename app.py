@@ -179,6 +179,19 @@ def china_province_by_name():
     return db_request_service.get_china_province_by_name(ChinaTotal, ChinaProvince, province_name)
 
 
+# ###############################预测################################
+@app.route('/forecast/china/province', methods=['GET'])
+def forecast_china_province():
+    """
+    预测- 根据开始结束时间查询省的数据
+    :return:
+    """
+    province_name = request.args.to_dict()['province']
+    start_time = request.args.to_dict()['start_time']
+    end_time = request.args.to_dict()['end_time']
+    return db_request_service.get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_time, end_time)
+
+
 # ##############
 @app.route('/pull', methods=['GET'])
 def pull():

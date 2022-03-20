@@ -5,6 +5,7 @@ import pandas as pd
 from sqlalchemy import and_, desc
 
 from common_config import region_map, special_province, special_cities
+from common_util import *
 
 """
 从MySQL获取数据并处理服务
@@ -293,3 +294,28 @@ def get_china_province_by_name(ChinaTotal, ChinaProvince, province_name):
     return json.dumps(ChinaProvince.query.filter(
         and_(ChinaProvince.name == province_name,
              ChinaProvince.china_total_id == most_new_china_total.id)).first().__self_dict__(), ensure_ascii=False)
+
+
+def get_china_total_by_date_time(ChinaTotal, date_time):
+    """
+    根据时间查询国内汇总数据
+    :param ChinaTotal:
+    :param date_time:
+    :return:
+    """
+    return ChinaTotal.query.filter(ChinaTotal.date_time == get_standard_time_by_date_time(date_time)).first()
+
+
+def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_time, end_time):
+    """
+    预测- 根据开始结束时间查询省的数据
+    """
+    # 根据时间查询国内汇总数据的id
+    start_china_total_id = get_china_total_by_date_time(ChinaTotal, start_time).id
+    end_china_total_id = get_china_total_by_date_time(ChinaTotal, end_time).id
+
+    return json.dumps(list(map(lambda x: x.__self_dict_and_date_time__(), ChinaProvince.query.filter(
+        and_(ChinaProvince.name == province_name,
+             ChinaProvince.china_total_id >= start_china_total_id,
+             ChinaProvince.china_total_id <= end_china_total_id)).all())),
+                      ensure_ascii=False)
