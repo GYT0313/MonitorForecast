@@ -529,7 +529,7 @@ function buttonClick() {
                 healCompareCount.push(item.heal)
                 deadCompareCount.push(item.dead)
                 nowConfirmCompareCount.push(item.now_confirm)
-                confirm_compareCount.push(item.confirm_compare)
+                confirm_compareCount.push(item.confirm_compare > 0 ? '+' + item.confirm_compare : item.confirm_compare)
                 date.push(item.date_time)
             })
 

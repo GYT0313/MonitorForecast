@@ -562,7 +562,7 @@
                 confirmCount.push(item.confirm)
                 deadCount.push(item.dead)
                 healCount.push(item.heal)
-                newAddConfirmCount.push(item.new_add_confirm)
+                newAddConfirmCount.push(item.new_add_confirm > 0 ? '+' + item.new_add_confirm : item.new_add_confirm)
                 deadRateCount.push(item.dead_rate)
                 healRateCount.push(item.heal_rate)
                 date.push(item.date_time)

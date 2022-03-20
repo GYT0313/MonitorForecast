@@ -113,10 +113,10 @@ def save_global_daily(db, GlobalDaily):
             else:
                 db.session.add(global_daily)
         db.session.commit()
-    except BaseException:
+    except BaseException as e:
         # 全球疫情数据只更新到了2021年9月1日，所以重复时不回滚，也不抛出异常
         # db.session.rollback()
-        # raise Exception('数据新增异常!')
+        # raise Exception('数据新增异常!', e)
         pass
 
 
@@ -159,9 +159,9 @@ def save_global_wom_world(db, GlobalWomWorld, data):
 
         db.session.commit()
         return is_add_or_update
-    except BaseException:
+    except BaseException as e:
         db.session.rollback()
-        raise Exception('全球数据新增异常!')
+        raise Exception('全球数据新增异常!', e)
 
 
 def save_global_wom_aboard(db, GlobalWomAboard, data, global_wom_world_id):
@@ -195,9 +195,9 @@ def save_global_wom_aboard(db, GlobalWomAboard, data, global_wom_world_id):
                 db.session.add(global_wom_aboard)
 
         db.session.commit()
-    except BaseException:
+    except BaseException as e:
         db.session.rollback()
-        raise Exception('全球数据新增异常!')
+        raise Exception('全球数据新增异常!', e)
 
 
 # ##############################################国内数据#################################################################
@@ -273,9 +273,9 @@ def save_china_total(db, ChinaTotal, data, last_update_time):
 
         db.session.commit()
         return is_add_or_update
-    except BaseException:
+    except BaseException as e:
         db.session.rollback()
-        raise Exception('国内汇总数据新增异常!')
+        raise Exception('国内汇总数据新增异常!', e)
 
 
 def save_china_daily(db, ChinaCompareDaily, data, date_time, china_total_id):
@@ -300,9 +300,9 @@ def save_china_daily(db, ChinaCompareDaily, data, date_time, china_total_id):
         if is_update_num <= 0:
             db.session.add(china_compare_daily)
         db.session.commit()
-    except BaseException:
+    except BaseException as e:
         db.session.rollback()
-        raise Exception('国内每日数据变化新增异常!')
+        raise Exception('国内每日数据变化新增异常!', e)
 
 
 def save_china_province_or_city(db, ChinaProvince, ChinaCity, province_and_city_list, china_total_id):
@@ -378,9 +378,9 @@ def save_china_province_or_city(db, ChinaProvince, ChinaCity, province_and_city_
                               china_total_id).id)
 
         db.session.commit()
-    except BaseException:
+    except BaseException as e:
         db.session.rollback()
-        raise Exception('国内省、城市数据新增异常!')
+        raise Exception('国内省、城市数据新增异常!', e)
 
 
 def request(url):

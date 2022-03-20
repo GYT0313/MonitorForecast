@@ -8,8 +8,8 @@ from flask import render_template
 from flask_apscheduler import APScheduler
 from flask_sqlalchemy import SQLAlchemy
 
-from src import database_config, tencent_request_service, db_request_service
 from common_util import *
+from src import database_config, tencent_request_service, db_request_service
 
 pymysql.install_as_MySQLdb()
 
@@ -409,7 +409,7 @@ class ChinaTotal(db.Model):
             'suspect': self.suspect,
             'now_severe': self.now_severe,
             'last_update_time': str(self.last_update_time),
-            'date_time': str(self.date_time)
+            'date_time': get_date_by_standard_time(str(self.date_time))
         }
 
 
@@ -448,7 +448,7 @@ class ChinaCompareDaily(db.Model):
             'now_confirm_compare': self.now_confirm_compare,
             'suspect_compare': self.suspect_compare,
             'now_severe_compare': self.now_severe_compare,
-            'date_time': str(self.date_time),
+            'date_time': get_date_by_standard_time(str(self.date_time)),
             'china_total_id': self.china_total_id
         }
 
@@ -478,7 +478,23 @@ class ChinaProvince(db.Model):
 
     def __self_dict__(self):
         """
-        返回所有属性的字典
+        返回所有属性的字典, 不包括date_time
+        :return:
+        """
+        return {
+            'id': self.id,
+            'name': self.name,
+            'confirm': self.confirm,
+            'heal': self.heal,
+            'dead': self.dead,
+            'now_confirm': self.now_confirm,
+            'confirm_compare': self.confirm_compare,
+            'china_total_id': self.china_total_id
+        }
+
+    def __self_dict_and_date_time__(self):
+        """
+        返回所有属性的字典, 包括date_time
         :return:
         """
         return {

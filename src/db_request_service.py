@@ -265,8 +265,10 @@ def get_province_daily(ChinaProvince, province_name):
     :param province_name:
     :return:
     """
+    # 省的每日数据需要返回日期, 所以使用__self_dict_and_date_time__()
     return json.dumps(
-        list(map(lambda x: x.__self_dict__(), ChinaProvince.query.filter(ChinaProvince.name == province_name).all())))
+        list(map(lambda x: x.__self_dict_and_date_time__(),
+                 ChinaProvince.query.filter(ChinaProvince.name == province_name).all())))
 
 
 def china_province_city_head_fifteen(ChinaTotal, ChinaProvince, ChinaCity, params):
