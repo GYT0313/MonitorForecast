@@ -4,13 +4,13 @@ import json
 import pandas as pd
 from sqlalchemy import and_, desc
 
-from common_config import region_map, special_province, special_cities
+from common_config import *
 from common_util import *
+from forecast_codv19 import *
 
 """
 从MySQL获取数据并处理服务
 """
-contents_name_list = ['亚洲', '非洲', '欧洲', '北美洲', '南美洲', '大洋洲', '其他']
 
 
 def get_most_new_data_by_last_update_time(ModelClassType):
@@ -310,12 +310,49 @@ def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_t
     """
     预测- 根据开始结束时间查询省的数据
     """
+    # 预测时间 end_time + 1天
+    forecast_time = str(time_plus_one_day(end_time))
+
     # 根据时间查询国内汇总数据的id
     start_china_total_id = get_china_total_by_date_time(ChinaTotal, start_time).id
     end_china_total_id = get_china_total_by_date_time(ChinaTotal, end_time).id
 
-    return json.dumps(list(map(lambda x: x.__self_dict_and_date_time__(), ChinaProvince.query.filter(
+    # start ~ end time历史数据
+    res = json.dumps(list(map(lambda x: x.__self_dict_and_date_time__(), ChinaProvince.query.filter(
         and_(ChinaProvince.name == province_name,
              ChinaProvince.china_total_id >= start_china_total_id,
              ChinaProvince.china_total_id <= end_china_total_id)).all())),
-                      ensure_ascii=False)
+                     ensure_ascii=False)
+
+    # 准备历史数据横纵值
+    df = pd.DataFrame(json.loads(res))
+    df['index'] = df.index
+    # x从1开始对应历史数据的时间
+    xy_df = pd.DataFrame()
+    xy_df['x'] = df['index'].apply(lambda v: v + 1)
+    # 预测累计确诊
+    forecast_name = 'confirm'
+    xy_df['y'] = df[forecast_name]
+
+    return get_forecast(df, xy_df, forecast_name, forecast_time)
+
+
+def get_forecast(df, xy_df, forecast_name, forecast_time):
+    """
+    预测疫情数据
+    :return:
+    """
+    a, b, x, y_prod = forecast(pd.DataFrame(xy_df[['x', 'y']]))
+    print('y = ' + str(a) + ' + ' + str(b) + 'x')
+
+    res_df = pd.DataFrame()
+    res_df['date_time'] = df['date_time']
+    res_df[forecast_name] = df[forecast_name]
+    forecast_confirm = pd.DataFrame(
+        {
+            'date_time': get_date_by_standard_time(forecast_time),
+            forecast_name: y_prod[-1]
+        },
+        index=[0])
+    res_df.append(forecast_confirm, ignore_index=True)
+    return res_df.to_json(orient='records')

@@ -11,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from common_util import *
 from src import database_config, tencent_request_service, db_request_service
 
+# 加上才能正确运行
 pymysql.install_as_MySQLdb()
 
 # app

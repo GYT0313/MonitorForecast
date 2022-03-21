@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 
+import datetime as dt
 from datetime import datetime
 
 """
@@ -24,3 +25,20 @@ def get_standard_time_by_date_time(date_time):
     :return:
     """
     return datetime.strptime(date_time, '%Y-%m-%d').__str__()
+
+
+def get_standard_time(standard_time):
+    """
+    返回格式化时间
+    :return:
+    """
+    return datetime.strptime(standard_time, '%Y-%m-%d %H:%M:%S')
+
+
+def time_plus_one_day(date_time):
+    """
+    时间+1天
+    :param date_time:  2022-03-10
+    :return:
+    """
+    return get_standard_time(get_standard_time_by_date_time(date_time)) + dt.timedelta(days=1)
