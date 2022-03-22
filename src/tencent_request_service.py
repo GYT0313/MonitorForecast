@@ -16,6 +16,8 @@ global_daily_url = 'https://api.inews.qq.com/newsqa/v1/automation/modules/list?m
                    'FAutoContinentStatis,FAutoGlobalDailyList,FAutoCountryConfirmAdd'
 china_url = 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5'
 
+# 省份历史数据
+province_history_url = 'https://api.inews.qq.com/newsqa/v1/query/pubished/daily/list?province=xxx'
 
 def request_global_data_url():
     """

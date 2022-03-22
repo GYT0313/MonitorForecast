@@ -560,12 +560,6 @@ function chinaClick() {
             dataType: 'json',
             success: function (data) {
                 data.forEach(item => {
-                    // confirmCompareCount.push(item.confirm_compare)
-                    // healCompareCount.push(item.heal_compare)
-                    // deadCompareCount.push(item.dead_compare)
-                    // nowConfirmCompareCount.push(item.now_confirm_compare)
-                    // suspectCompareCount.push(item.suspect_compare)
-                    // nowSevereCompareCount.push(item.now_severe_compare)
                     confirmCompareCount.push(item.confirm_compare > 0 ? '+' + item.confirm_compare : item.confirm_compare)
                     healCompareCount.push(item.heal_compare > 0 ? '+' + item.heal_compare : item.heal_compare)
                     deadCompareCount.push(item.dead_compare > 0 ? '+' + item.dead_compare : item.dead_compare)

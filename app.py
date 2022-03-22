@@ -134,10 +134,19 @@ def china_region():
 @app.route('/china/province/city/json', methods=['GET'])
 def china_province_of_city_json():
     """
-    获取各省对应的城市json
+    获取各省对应的城市json, 跳过港澳台
     :return:
     """
     return db_request_service.get_china_province_of_city_json(ChinaTotal, ChinaProvince, ChinaCity)
+
+
+@app.route('/china/province/cities/json', methods=['GET'])
+def china_province_of_cities_json():
+    """
+    获取各省对应的城市json，包括港澳台
+    :return:
+    """
+    return db_request_service.get_china_province_of_cities_json(ChinaTotal, ChinaProvince, ChinaCity)
 
 
 @app.route('/china/province/city', methods=['GET'])
@@ -188,9 +197,18 @@ def forecast_china_province():
     :return:
     """
     province_name = request.args.to_dict()['province']
-    start_time = request.args.to_dict()['start_time']
-    end_time = request.args.to_dict()['end_time']
+    start_time = request.args.to_dict()['startTime']
+    end_time = request.args.to_dict()['endTime']
     return db_request_service.get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_time, end_time)
+
+
+@app.route('/forecast/china/time', methods=['GET'])
+def forecast_support_time():
+    """
+    返回支持选择的时间段
+    :return:
+    """
+    return db_request_service.get_forecast_support_time(ChinaTotal)
 
 
 # ##############

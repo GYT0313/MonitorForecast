@@ -240,12 +240,18 @@
         <section class="mainbox">
             <!-- 左 -->
             <div class="column">
-                <div class="panel bl bar">
+                <div class="panel bl forecastBar">
                     <h2>预测</h2>
-                    <div class="chart"></div>
+                    <select name="forecastProvince" id="forecastProvince"></select>
+                    <select name="forecastCity" id="forecastCity" hidden="hidden"></select>
+                    <ul>
+                        <li><p>起始</p><input type="date" id="startTime"/></li>
+                        <li><p>结束</p><input type="date" id="endTime"/></li>
+                    </ul>
+                    <button onclick="forecastButtonClick()" type="submit" id="forecast-submit">确认</button>
                     <div class="panelFooter"></div>
                 </div>
-                <div class="panel bl line">
+                <div class="panel bl forecastLine">
                     <h2>预测</h2>
                     <div class="chart"></div>
                     <div class="panelFooter"></div>
@@ -301,6 +307,7 @@
 <script src="../static/js/index.js"></script>
 <script src="../static/js/china-chart.js"></script>
 <script src="../static/js/province-chart.js"></script>
+<script src="../static/js/forecast-chart.js"></script>
 </body>
 
 </html>

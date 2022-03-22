@@ -259,6 +259,35 @@ def get_china_province_of_city_json(ChinaTotal, ChinaProvince, ChinaCity):
     }, ensure_ascii=False)
 
 
+def get_china_province_of_cities_json(ChinaTotal, ChinaProvince, ChinaCity):
+    """
+    获取各省对应城市json
+    :param ChinaTotal:
+    :param ChinaProvince:
+    :param ChinaCity:
+    :return:
+    """
+    result = []
+    most_new_china_total = get_most_new_data_by_last_update_time(ChinaTotal)
+    province_list = ChinaProvince.query.filter(ChinaProvince.china_total_id == most_new_china_total.id).all()
+    for province in province_list:
+        city_list = ChinaCity.query.filter(ChinaCity.china_province_id == province.id).all()
+        cities = []
+        for city in city_list:
+            # 跳过城市为'境外输入', '地区待确认'
+            if city.name in special_cities:
+                continue
+            cities.append({"name": city.name})
+        result.append({
+            "name": province.name,
+            "cities": cities
+        })
+
+    return json.dumps({
+        "provinces": result
+    }, ensure_ascii=False)
+
+
 def get_province_daily(ChinaProvince, province_name):
     """
     省份每日数据变化趋势
@@ -345,14 +374,38 @@ def get_forecast(df, xy_df, forecast_name, forecast_time):
     a, b, x, y_prod = forecast(pd.DataFrame(xy_df[['x', 'y']]))
     print('y = ' + str(a) + ' + ' + str(b) + 'x')
 
+    # 创建结果df
     res_df = pd.DataFrame()
     res_df['date_time'] = df['date_time']
     res_df[forecast_name] = df[forecast_name]
+    # 原历史数据的第二天值设置为?
     forecast_confirm = pd.DataFrame(
         {
             'date_time': get_date_by_standard_time(forecast_time),
-            forecast_name: y_prod[-1]
+            forecast_name: "?"
         },
         index=[0])
-    res_df.append(forecast_confirm, ignore_index=True)
+    res_df = res_df.append(forecast_confirm, ignore_index=True)
+    # 增加一列预测值
+    res_df['confirm_forecast'] = pd.DataFrame(list(map(lambda v: {"confirm_forecast": v}, y_prod)))
+
     return res_df.to_json(orient='records')
+
+
+def get_forecast_support_time(ChinaTotal):
+    """
+
+    :param ChinaTotal:
+    :return:
+    """
+    # 降序查询
+    china_total_all = ChinaTotal.query.order_by(desc(ChinaTotal.date_time)).all()
+    end_time = china_total_all[0].date_time.date().__str__()
+    start_time = china_total_all[-1].date_time.date().__str__()
+    return json.dumps(
+        {
+            "start_time": start_time,
+            "end_time": end_time
+        },
+        ensure_ascii=False
+    )
