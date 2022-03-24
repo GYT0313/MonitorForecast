@@ -16,4 +16,6 @@ pip install requests==2.27.1 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 pip install pymysql==1.0.2 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
+pip install pillow==8.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
+
 pip install sklearn -i https://pypi.tuna.tsinghua.edu.cn/simple

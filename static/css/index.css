@@ -197,6 +197,22 @@ header h1 {
     /* background-color: pink; */
 }
 
+
+.forecastLine {
+    height: 8.95rem;
+    position: relative;
+}
+
+.forecastLine .chart {
+    position: absolute;
+    top: 0.5rem;
+    left: 0;
+    width: 100%;
+    height: 8.45rem;
+    border: 1px solid rgba(25, 186, 139, 0.17);
+}
+
+
 .bar1 {
     height: 10.3rem;
 }

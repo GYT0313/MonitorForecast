@@ -9,10 +9,11 @@ from sklearn import linear_model
 # from sklearn.model_selection import train_test_split
 
 
-def forecast(df):
+def forecast(df, feature_nums):
     """
     sklearn 一元线性回归模型
     :param df: 训练数据
+    :param feature_nums 预测未来几天的
     :return: # 分别是常熟a、系数b、横坐标x列表、预测值y列表
     """
     """
@@ -34,15 +35,19 @@ def forecast(df):
     # 线性模型的系数 系数b
     print(model.coef_[0][0])
 
-    # 预测, x为最有的值+1, 即时间返回end_time的第二天
-    x_pred = x[-1][0] + 1
-    # 使用预测模型预测历史数据和将来数据x_test_list[-1] 为将来的自变量x(意义上的未来某一天)
+    # 预测, x为最后的值+1, 即时间返回end_time的第二天、三天...
+    x_pred = []
+    for i in range(1, feature_nums + 1):
+        x_pred.append(x[-1][0] + i)
+
+    # 使用预测模型预测历史数据和将来数据x_test_list] 为将来的自变量x(意义上的未来某一天)
     x_test_list = copy.deepcopy(x)
-    x_test_list.append([x_pred])
+    for v in x_pred:
+        x_test_list.append([v])
     y_pred_list = model.predict(x_test_list)
 
     # 使用历史数据、预测数据绘制图形
-    graphic_drawing(x, y, x_test_list, y_pred_list)
+    graphic_drawing(x, y, x_test_list, y_pred_list, feature_nums)
 
     # 分别是常熟a（保留两位小数）、系数b（保留两位小数）、横坐标x列表、预测值y列表（向下取整）
     return round(model.intercept_[0], 2), \
@@ -66,13 +71,14 @@ def get_plt(size=None):
     return plt
 
 
-def graphic_drawing(x_original, y_original, x_test_list, y_pred_list):
+def graphic_drawing(x_original, y_original, x_test_list, y_pred_list, feature_nums):
     """
     根据历史数据和预测数据绘图
     :param x_original:
     :param y_original:
     :param x_test_list:
     :param y_pred_list:
+    :param feature_nums
     :return:
     """
     plt = get_plt()
@@ -81,7 +87,7 @@ def graphic_drawing(x_original, y_original, x_test_list, y_pred_list):
     plt.plot(x_original, y_original, 'k.')
 
     # 预测数据散点
-    plt.scatter(x_test_list[-1], y_pred_list[-1], color='blue')
+    plt.scatter(x_test_list[-1 * feature_nums:], y_pred_list[-1 * feature_nums:], color='blue')
 
     # 通过回归方程的值绘线
     plt.plot(x_test_list, y_pred_list, 'r')

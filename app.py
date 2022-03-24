@@ -199,7 +199,10 @@ def forecast_china_province():
     province_name = request.args.to_dict()['province']
     start_time = request.args.to_dict()['startTime']
     end_time = request.args.to_dict()['endTime']
-    return db_request_service.get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_time, end_time)
+    # 预测几天数据
+    forecast_nums = request.args.to_dict()['forecastNums']
+    return db_request_service.get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_time, end_time,
+                                                         forecast_nums)
 
 
 @app.route('/forecast/china/time', methods=['GET'])

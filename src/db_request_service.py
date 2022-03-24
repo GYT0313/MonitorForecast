@@ -335,12 +335,12 @@ def get_china_total_by_date_time(ChinaTotal, date_time):
     return ChinaTotal.query.filter(ChinaTotal.date_time == get_standard_time_by_date_time(date_time)).first()
 
 
-def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_time, end_time):
+def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_time, end_time, forecast_nums):
     """
     预测- 根据开始结束时间查询省的数据
     """
-    # 预测时间 end_time + 1天
-    forecast_time = str(time_plus_one_day(end_time))
+    # 获得要预测的时间, 第二个参数可以设置未来那几天的值, 1 - forecast_time = [end_time+1],  2 - forecast_time = [end_time+1, end_time+2]
+    forecast_time = get_feature_time(end_time, int(forecast_nums))
 
     # 根据时间查询国内汇总数据的id
     start_china_total_id = get_china_total_by_date_time(ChinaTotal, start_time).id
@@ -359,42 +359,71 @@ def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_t
     # x从1开始对应历史数据的时间
     xy_df = pd.DataFrame()
     xy_df['x'] = df['index'].apply(lambda v: v + 1)
+
+    str_forecast = '_forecast'
     # 预测累计确诊
-    forecast_name = 'confirm'
-    xy_df['y'] = df[forecast_name]
+    confirm_name = 'confirm'
+    k_confirm_name = confirm_name + str_forecast
+    xy_df['y'] = df[confirm_name]
+    df_confirm_forecast = get_forecast(xy_df, k_confirm_name, len(forecast_time))
 
-    return get_forecast(df, xy_df, forecast_name, forecast_time)
+    # 预测累计治愈
+    heal_name = 'heal'
+    k_heal_name = heal_name + str_forecast
+    xy_df['y'] = df[heal_name]
+    df_heal_forecast = get_forecast(xy_df, k_heal_name, len(forecast_time))
+
+    # 预测累计死亡
+    dead_name = 'dead'
+    k_dead_name = dead_name + str_forecast
+    xy_df['y'] = df[dead_name]
+    df_dead_forecast = get_forecast(xy_df, k_dead_name, len(forecast_time))
+
+    # 预测现有确诊
+    now_confirm_name = 'now_confirm'
+    k_now_confirm_name = now_confirm_name + str_forecast
+    xy_df['y'] = df[now_confirm_name]
+    df_now_confirm_forecast = get_forecast(xy_df, k_now_confirm_name, len(forecast_time))
+
+    # 预测较昨日确诊
+    confirm_compare_name = 'confirm_compare'
+    k_confirm_compare_name = confirm_compare_name + str_forecast
+    xy_df['y'] = df[confirm_compare_name]
+    df_confirm_compare_forecast = get_forecast(xy_df, k_confirm_compare_name, len(forecast_time))
+
+    # 增加行 - 未来日期
+    for f_date_time in forecast_time:
+        # df = df.append(pd.DataFrame({"date_time": get_date_by_standard_time(f_date_time)}, index=[0]),
+        #                ignore_index=True)
+        df = pd.concat([df, pd.DataFrame({"date_time": get_date_by_standard_time(f_date_time)}, index=[0])], axis=0,
+                       ignore_index=True)
+
+    df = pd.concat([df, df_confirm_forecast, df_heal_forecast, df_dead_forecast, df_now_confirm_forecast,
+                    df_confirm_compare_forecast], axis=1)
+
+    return df.to_json(orient='records')
 
 
-def get_forecast(df, xy_df, forecast_name, forecast_time):
+def get_forecast(xy_df, k_name, feature_nums):
     """
     预测疫情数据
     :return:
     """
-    a, b, x, y_prod = forecast(pd.DataFrame(xy_df[['x', 'y']]))
+    k_a = k_name + "_a"
+    k_b = k_name + "_b"
+    a, b, x, y_prod = forecast(pd.DataFrame(xy_df[['x', 'y']]), feature_nums)
     print('y = ' + str(a) + ' + ' + str(b) + 'x')
 
-    # 创建结果df
-    res_df = pd.DataFrame()
-    res_df['date_time'] = df['date_time']
-    res_df[forecast_name] = df[forecast_name]
-    # 原历史数据的第二天值设置为?
-    forecast_confirm = pd.DataFrame(
-        {
-            'date_time': get_date_by_standard_time(forecast_time),
-            forecast_name: "?"
-        },
-        index=[0])
-    res_df = res_df.append(forecast_confirm, ignore_index=True)
-    # 增加一列预测值
-    res_df['confirm_forecast'] = pd.DataFrame(list(map(lambda v: {"confirm_forecast": v}, y_prod)))
-
-    return res_df.to_json(orient='records')
+    return pd.DataFrame(list(map(lambda v: {
+        k_name: v,
+        k_a: a,
+        k_b: b
+    }, y_prod)))
 
 
 def get_forecast_support_time(ChinaTotal):
     """
-
+    查询MySQL中数据最早时间和最新时间
     :param ChinaTotal:
     :return:
     """
