@@ -240,198 +240,6 @@ function forecastButtonClick() {
                     {
                         // 开始不显示拐点， 鼠标经过显示
                         showSymbol: false,
-                        name: "累计治愈",
-                        type: "line",
-                        smooth: true,
-                        lineStyle: {
-                            normal: {
-                                color: "#00FF7F",
-                                width: 2
-                            }
-                        },
-                        areaStyle: {
-                            normal: {
-                                color: new echarts.graphic.LinearGradient(
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    [{
-                                        offset: 0,
-                                        color: "rgba(0, 216, 135, 0.4)"
-                                    },
-                                        {
-                                            offset: 0.8,
-                                            color: "rgba(0, 216, 135, 0.1)"
-                                        }
-                                    ],
-                                    false
-                                ),
-                                shadowColor: "rgba(0, 0, 0, 0.1)"
-                            }
-                        },
-                        // 设置拐点 小圆点
-                        symbol: "circle",
-                        // 拐点大小
-                        symbolSize: 5,
-                        // 设置拐点颜色以及边框
-                        itemStyle: {
-                            color: "#00FF7F",
-                            borderColor: "rgba(221, 220, 107, .1)",
-                            borderWidth: 12
-                        },
-                        // 开始不显示拐点， 鼠标经过显示
-                        showSymbol: false,
-                        // data: [120, 132, 101, 134, 90, 230, 210]
-                        // stack: '总量',
-                    },
-                    {
-                        // 开始不显示拐点， 鼠标经过显示
-                        showSymbol: false,
-                        name: "累计死亡",
-                        type: "line",
-                        smooth: true,
-                        lineStyle: {
-                            normal: {
-                                color: "#c71b1b",
-                                width: 2
-                            }
-                        },
-                        areaStyle: {
-                            normal: {
-                                color: new echarts.graphic.LinearGradient(
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    [{
-                                        offset: 0,
-                                        color: "rgba(0, 216, 135, 0.4)"
-                                    },
-                                        {
-                                            offset: 0.8,
-                                            color: "rgba(0, 216, 135, 0.1)"
-                                        }
-                                    ],
-                                    false
-                                ),
-                                shadowColor: "rgba(0, 0, 0, 0.1)"
-                            }
-                        },
-                        // 设置拐点 小圆点
-                        symbol: "circle",
-                        // 拐点大小
-                        symbolSize: 5,
-                        // 设置拐点颜色以及边框
-                        itemStyle: {
-                            color: "#c71b1b",
-                            borderColor: "rgba(221, 220, 107, .1)",
-                            borderWidth: 12
-                        },
-                        // 开始不显示拐点， 鼠标经过显示
-                        showSymbol: false,
-                        // data: [120, 132, 101, 134, 90, 230, 210]
-                        // stack: '总量',
-                    },
-                    {
-                        // 开始不显示拐点， 鼠标经过显示
-                        showSymbol: false,
-                        name: "现有确诊",
-                        type: "line",
-                        smooth: true,
-                        lineStyle: {
-                            normal: {
-                                color: "#FF00FF",
-                                width: 2
-                            }
-                        },
-                        areaStyle: {
-                            normal: {
-                                color: new echarts.graphic.LinearGradient(
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    [{
-                                        offset: 0,
-                                        color: "rgba(0, 216, 135, 0.4)"
-                                    },
-                                        {
-                                            offset: 0.8,
-                                            color: "rgba(0, 216, 135, 0.1)"
-                                        }
-                                    ],
-                                    false
-                                ),
-                                shadowColor: "rgba(0, 0, 0, 0.1)"
-                            }
-                        },
-                        // 设置拐点 小圆点
-                        symbol: "circle",
-                        // 拐点大小
-                        symbolSize: 5,
-                        // 设置拐点颜色以及边框
-                        itemStyle: {
-                            color: "#FF00FF",
-                            borderColor: "rgba(221, 220, 107, .1)",
-                            borderWidth: 12
-                        },
-                        // 开始不显示拐点， 鼠标经过显示
-                        showSymbol: false,
-                        // data: [120, 132, 101, 134, 90, 230, 210]
-                        // stack: '总量',
-                    },
-                    {
-                        // 开始不显示拐点， 鼠标经过显示
-                        showSymbol: false,
-                        name: "较昨日确诊",
-                        type: "line",
-                        smooth: true,
-                        lineStyle: {
-                            normal: {
-                                color: "#FF69B4",
-                                width: 2
-                            }
-                        },
-                        areaStyle: {
-                            normal: {
-                                color: new echarts.graphic.LinearGradient(
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    [{
-                                        offset: 0,
-                                        color: "rgba(0, 216, 135, 0.4)"
-                                    },
-                                        {
-                                            offset: 0.8,
-                                            color: "rgba(0, 216, 135, 0.1)"
-                                        }
-                                    ],
-                                    false
-                                ),
-                                shadowColor: "rgba(0, 0, 0, 0.1)"
-                            }
-                        },
-                        // 设置拐点 小圆点
-                        symbol: "circle",
-                        // 拐点大小
-                        symbolSize: 5,
-                        // 设置拐点颜色以及边框
-                        itemStyle: {
-                            color: "#FF69B4",
-                            borderColor: "rgba(221, 220, 107, .1)",
-                            borderWidth: 12
-                        },
-                        // 开始不显示拐点， 鼠标经过显示
-                        showSymbol: false,
-                        // data: [120, 132, 101, 134, 90, 230, 210]
-                        // stack: '总量',
-                    },
-                    {
-                        // 开始不显示拐点， 鼠标经过显示
-                        showSymbol: false,
                         name: "预测累计确诊",
                         type: "line",
                         smooth: true,
@@ -469,6 +277,54 @@ function forecastButtonClick() {
                         // 设置拐点颜色以及边框
                         itemStyle: {
                             color: "#ffdb5c",
+                            borderColor: "rgba(221, 220, 107, .1)",
+                            borderWidth: 12
+                        },
+                        // 开始不显示拐点， 鼠标经过显示
+                        showSymbol: false,
+                        // data: [120, 132, 101, 134, 90, 230, 210]
+                        // stack: '总量',
+                    },
+                    {
+                        // 开始不显示拐点， 鼠标经过显示
+                        showSymbol: false,
+                        name: "累计治愈",
+                        type: "line",
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                color: "#00FF7F",
+                                width: 2
+                            }
+                        },
+                        areaStyle: {
+                            normal: {
+                                color: new echarts.graphic.LinearGradient(
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    [{
+                                        offset: 0,
+                                        color: "rgba(0, 216, 135, 0.4)"
+                                    },
+                                        {
+                                            offset: 0.8,
+                                            color: "rgba(0, 216, 135, 0.1)"
+                                        }
+                                    ],
+                                    false
+                                ),
+                                shadowColor: "rgba(0, 0, 0, 0.1)"
+                            }
+                        },
+                        // 设置拐点 小圆点
+                        symbol: "circle",
+                        // 拐点大小
+                        symbolSize: 5,
+                        // 设置拐点颜色以及边框
+                        itemStyle: {
+                            color: "#00FF7F",
                             borderColor: "rgba(221, 220, 107, .1)",
                             borderWidth: 12
                         },
@@ -528,6 +384,54 @@ function forecastButtonClick() {
                     {
                         // 开始不显示拐点， 鼠标经过显示
                         showSymbol: false,
+                        name: "累计死亡",
+                        type: "line",
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                color: "#c71b1b",
+                                width: 2
+                            }
+                        },
+                        areaStyle: {
+                            normal: {
+                                color: new echarts.graphic.LinearGradient(
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    [{
+                                        offset: 0,
+                                        color: "rgba(0, 216, 135, 0.4)"
+                                    },
+                                        {
+                                            offset: 0.8,
+                                            color: "rgba(0, 216, 135, 0.1)"
+                                        }
+                                    ],
+                                    false
+                                ),
+                                shadowColor: "rgba(0, 0, 0, 0.1)"
+                            }
+                        },
+                        // 设置拐点 小圆点
+                        symbol: "circle",
+                        // 拐点大小
+                        symbolSize: 5,
+                        // 设置拐点颜色以及边框
+                        itemStyle: {
+                            color: "#c71b1b",
+                            borderColor: "rgba(221, 220, 107, .1)",
+                            borderWidth: 12
+                        },
+                        // 开始不显示拐点， 鼠标经过显示
+                        showSymbol: false,
+                        // data: [120, 132, 101, 134, 90, 230, 210]
+                        // stack: '总量',
+                    },
+                    {
+                        // 开始不显示拐点， 鼠标经过显示
+                        showSymbol: false,
                         name: "预测累计死亡",
                         type: "line",
                         smooth: true,
@@ -576,6 +480,54 @@ function forecastButtonClick() {
                     {
                         // 开始不显示拐点， 鼠标经过显示
                         showSymbol: false,
+                        name: "现有确诊",
+                        type: "line",
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                color: "#FF00FF",
+                                width: 2
+                            }
+                        },
+                        areaStyle: {
+                            normal: {
+                                color: new echarts.graphic.LinearGradient(
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    [{
+                                        offset: 0,
+                                        color: "rgba(0, 216, 135, 0.4)"
+                                    },
+                                        {
+                                            offset: 0.8,
+                                            color: "rgba(0, 216, 135, 0.1)"
+                                        }
+                                    ],
+                                    false
+                                ),
+                                shadowColor: "rgba(0, 0, 0, 0.1)"
+                            }
+                        },
+                        // 设置拐点 小圆点
+                        symbol: "circle",
+                        // 拐点大小
+                        symbolSize: 5,
+                        // 设置拐点颜色以及边框
+                        itemStyle: {
+                            color: "#FF00FF",
+                            borderColor: "rgba(221, 220, 107, .1)",
+                            borderWidth: 12
+                        },
+                        // 开始不显示拐点， 鼠标经过显示
+                        showSymbol: false,
+                        // data: [120, 132, 101, 134, 90, 230, 210]
+                        // stack: '总量',
+                    },
+                    {
+                        // 开始不显示拐点， 鼠标经过显示
+                        showSymbol: false,
                         name: "预测现有确诊",
                         type: "line",
                         smooth: true,
@@ -613,6 +565,54 @@ function forecastButtonClick() {
                         // 设置拐点颜色以及边框
                         itemStyle: {
                             color: "#DDA0DD",
+                            borderColor: "rgba(221, 220, 107, .1)",
+                            borderWidth: 12
+                        },
+                        // 开始不显示拐点， 鼠标经过显示
+                        showSymbol: false,
+                        // data: [120, 132, 101, 134, 90, 230, 210]
+                        // stack: '总量',
+                    },
+                    {
+                        // 开始不显示拐点， 鼠标经过显示
+                        showSymbol: false,
+                        name: "较昨日确诊",
+                        type: "line",
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                color: "#FF69B4",
+                                width: 2
+                            }
+                        },
+                        areaStyle: {
+                            normal: {
+                                color: new echarts.graphic.LinearGradient(
+                                    0,
+                                    0,
+                                    0,
+                                    1,
+                                    [{
+                                        offset: 0,
+                                        color: "rgba(0, 216, 135, 0.4)"
+                                    },
+                                        {
+                                            offset: 0.8,
+                                            color: "rgba(0, 216, 135, 0.1)"
+                                        }
+                                    ],
+                                    false
+                                ),
+                                shadowColor: "rgba(0, 0, 0, 0.1)"
+                            }
+                        },
+                        // 设置拐点 小圆点
+                        symbol: "circle",
+                        // 拐点大小
+                        symbolSize: 5,
+                        // 设置拐点颜色以及边框
+                        itemStyle: {
+                            color: "#FF69B4",
                             borderColor: "rgba(221, 220, 107, .1)",
                             borderWidth: 12
                         },
@@ -688,14 +688,14 @@ function forecastButtonClick() {
 
             data.forEach(item => {
                 confirmHistory.push(item.confirm)
-                healHistory.push(item.heal)
-                deadHistory.push(item.dead)
-                nowConfirmHistory.push(item.now_confirm)
-                confirmCompareHistory.push(item.confirm_compare)
                 confirmForecast.push(item.confirm_forecast)
+                healHistory.push(item.heal)
                 healForecast.push(item.heal_forecast)
+                deadHistory.push(item.dead)
                 deadForecast.push(item.dead_forecast)
+                nowConfirmHistory.push(item.now_confirm)
                 nowConfirmForecast.push(item.now_confirm_forecast)
+                confirmCompareHistory.push(item.confirm_compare)
                 confirmCompareForecast.push(item.confirm_compare_forecast)
                 date.push(item.date_time)
             })
@@ -706,24 +706,24 @@ function forecastButtonClick() {
                 series: [{
                     data: confirmHistory
                 }, {
-                    data: healHistory
-                }, {
-                    data: deadHistory
-                }, {
-                    data: nowConfirmHistory
-                }, {
-                    data: confirmCompareHistory
-                }, {
                     data: confirmForecast
+                }, {
+                    data: healHistory
                 }, {
                     data: healForecast
                 }, {
+                    data: deadHistory
+                }, {
                     data: deadForecast
+                }, {
+                    data: nowConfirmHistory
                 }, {
                     data: nowConfirmForecast
                 }, {
+                    data: confirmCompareHistory
+                }, {
                     data: confirmCompareForecast
-                },],
+                }],
                 xAxis: [{
                     data: date
                 }]
