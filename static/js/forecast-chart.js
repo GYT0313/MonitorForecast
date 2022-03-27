@@ -695,8 +695,8 @@ function forecastButtonClick() {
                 deadForecast.push(item.dead_forecast)
                 nowConfirmHistory.push(item.now_confirm)
                 nowConfirmForecast.push(item.now_confirm_forecast)
-                confirmCompareHistory.push(item.confirm_compare)
-                confirmCompareForecast.push(item.confirm_compare_forecast)
+                confirmCompareHistory.push(item.confirm_compare > 0 ? "+" + item.confirm_compare : item.confirm_compare)
+                confirmCompareForecast.push(item.confirm_compare_forecast > 0 ? "+" + item.confirm_compare_forecast : item.confirm_compare_forecast)
                 date.push(item.date_time)
             })
 
@@ -732,23 +732,45 @@ function forecastButtonClick() {
             window.addEventListener('resize', function () {
                 myChart.resize()
             })
+
+
+            // 左下table常数、系数显示
+            var item = data[0]
+            var linearRegressions = [
+                {
+                    "name": "预测累计确诊",
+                    "a": item.confirm_forecast_a,
+                    "b": item.confirm_forecast_b
+                },
+                {
+                    "name": "预测累计治愈",
+                    "a": item.heal_forecast_a,
+                    "b": item.heal_forecast_b
+                },
+                {
+                    "name": "预测累计死亡",
+                    "a": item.dead_forecast_a,
+                    "b": item.dead_forecast_b
+                },
+                {
+                    "name": "预测现有确诊",
+                    "a": item.now_confirm_forecast_a,
+                    "b": item.now_confirm_forecast_b
+                },
+                {
+                    "name": "预测较昨日确诊",
+                    "a": item.confirm_compare_forecast_a,
+                    "b": item.confirm_compare_forecast_b
+                },
+            ]
+            $('#forecastLinearRegression').html("")
+            tableHead = "<tr><th id='tableHeadLine' style='background-color: rgba(255, 145, 0, 0.7);'><span style=\"float:left;\">类型</span><span style=\"float:right;\">名称</span></th><th>常数a</th><th>系数b</th></tr>"
+            $('#forecastLinearRegression').append(tableHead);
+            linearRegressions.forEach(lr => {
+                item = "<tr><td><h4>" + lr.name + "</h4></td><td>" + lr.a + "</td><td>" + lr.b + "</td></tr>";
+                $('#forecastLinearRegression').append(item);
+            })
         }
     })
-
-
-    // // 中间累计数据
-    // $.ajax({
-    //     url: 'http://127.0.0.1:5000/china/province/new',
-    //     type: 'get',
-    //     data: params,
-    //     dataType: 'json',
-    //     success: function (data) {
-    //         $(".no-hd-province li:first").text(data.confirm)
-    //         $(".no-hd-province li:nth-child(2)").text(data.heal)
-    //         $(".no-hd-province li:nth-child(3)").text(data.now_confirm)
-    //         $(".no-hd-province li:nth-child(4)").text(data.dead)
-    //     }
-    // })
-
 
 }

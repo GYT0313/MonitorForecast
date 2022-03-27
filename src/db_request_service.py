@@ -356,9 +356,9 @@ def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_t
     # 准备历史数据横纵值
     df = pd.DataFrame(json.loads(res))
     df['index'] = df.index
-    # x从1开始对应历史数据的时间
+    # x从0开始对应历史数据的时间
     xy_df = pd.DataFrame()
-    xy_df['x'] = df['index'].apply(lambda v: v + 1)
+    xy_df['x'] = df['index']
 
     str_forecast = '_forecast'
     # 预测累计确诊
@@ -393,8 +393,6 @@ def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_t
 
     # 增加行 - 未来日期
     for f_date_time in forecast_time:
-        # df = df.append(pd.DataFrame({"date_time": get_date_by_standard_time(f_date_time)}, index=[0]),
-        #                ignore_index=True)
         df = pd.concat([df, pd.DataFrame({"date_time": get_date_by_standard_time(f_date_time)}, index=[0])], axis=0,
                        ignore_index=True)
 

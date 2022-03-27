@@ -199,16 +199,16 @@ header h1 {
 
 
 .forecastLine {
-    height: 8.95rem;
+    height: 10.29rem;
     position: relative;
 }
 
 .forecastLine .chart {
     position: absolute;
-    top: 0.5rem;
+    top: 0.6rem;
     left: 0;
     width: 100%;
-    height: 8.45rem;
+    height: 9.69rem;
     border: 1px solid rgba(25, 186, 139, 0.17);
 }
 
@@ -373,6 +373,88 @@ header h1 {
     height: 8.95rem;
     border: 1px solid rgba(25, 186, 139, 0.17);
 }
+
+/*table {*/
+/*    border-collapse: collapse;*/
+/*    margin: 0 auto;*/
+/*    text-align: center;*/
+/*    font-size: 18px;*/
+/*    background-color: rgba(101, 132, 226, 0.1);*/
+/*}*/
+
+/*table td, table th {*/
+/*    border: 1px solid #cad9ea;*/
+/*    color: #666;*/
+/*    height: 35px;*/
+/*}*/
+
+/*table th {*/
+/*    background-color: #CCE8EB;*/
+/*    width: 100px;*/
+/*}*/
+
+/*table span {*/
+/*    font-size: 14px;*/
+/*}*/
+/*#tableHeadLine {*/
+/*    background: #fff url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjEwMCUiIHkyPSIxMDAlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=) no-repeat 100% center;*/
+/*}*/
+/*table tr:nth-child(odd) {*/
+/*    background: #fff;*/
+/*}*/
+
+/*table tr:nth-child(even) {*/
+/*    background: #F5FAFA;*/
+/*}*/
+
+.forecastLineDiv {
+    display: flex;
+    align-items: center;
+}
+table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 18px;
+}
+
+table td, table th {
+    border: 0.0001rem solid #cad9ea;
+    color: #666;
+    height: 0.7rem;
+}
+
+table th {
+    background-color: rgba(255, 145, 0, 0.7);
+    width: 2rem;
+    color: white;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+table span {
+    font-size: 16px;
+    color: white;
+    font-weight: bold;
+}
+
+table h4 {
+    font-size: 0.275rem;
+}
+
+#tableHeadLine {
+    background: #fff url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxsaW5lIHgxPSIwIiB5MT0iMCIgeDI9IjEwMCUiIHkyPSIxMDAlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=) no-repeat 100% center;
+}
+
+table td {
+    flex: 3;
+    font-size: 0.4rem;
+    /*height: 0.5rem;*/
+    text-align: center;
+    color: #ffeb7b;
+    font-family: electronicFont;
+}
+
 
 @keyframes rotate {
     from {
