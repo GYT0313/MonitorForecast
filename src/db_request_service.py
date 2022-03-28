@@ -365,31 +365,31 @@ def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_t
     confirm_name = 'confirm'
     k_confirm_name = confirm_name + str_forecast
     xy_df['y'] = df[confirm_name]
-    df_confirm_forecast = get_forecast(xy_df, k_confirm_name, len(forecast_time))
+    df_confirm_forecast, confirm_src = get_forecast(xy_df, k_confirm_name, len(forecast_time))
 
     # 预测累计治愈
     heal_name = 'heal'
     k_heal_name = heal_name + str_forecast
     xy_df['y'] = df[heal_name]
-    df_heal_forecast = get_forecast(xy_df, k_heal_name, len(forecast_time))
+    df_heal_forecast, heal_src = get_forecast(xy_df, k_heal_name, len(forecast_time))
 
     # 预测累计死亡
     dead_name = 'dead'
     k_dead_name = dead_name + str_forecast
     xy_df['y'] = df[dead_name]
-    df_dead_forecast = get_forecast(xy_df, k_dead_name, len(forecast_time))
+    df_dead_forecast, dead_src = get_forecast(xy_df, k_dead_name, len(forecast_time))
 
     # 预测现有确诊
     now_confirm_name = 'now_confirm'
     k_now_confirm_name = now_confirm_name + str_forecast
     xy_df['y'] = df[now_confirm_name]
-    df_now_confirm_forecast = get_forecast(xy_df, k_now_confirm_name, len(forecast_time))
+    df_now_confirm_forecast, now_confirm_src = get_forecast(xy_df, k_now_confirm_name, len(forecast_time))
 
     # 预测较昨日确诊
     confirm_compare_name = 'confirm_compare'
     k_confirm_compare_name = confirm_compare_name + str_forecast
     xy_df['y'] = df[confirm_compare_name]
-    df_confirm_compare_forecast = get_forecast(xy_df, k_confirm_compare_name, len(forecast_time))
+    df_confirm_compare_forecast, confirm_compare_src = get_forecast(xy_df, k_confirm_compare_name, len(forecast_time))
 
     # 增加行 - 未来日期
     for f_date_time in forecast_time:
@@ -399,7 +399,11 @@ def get_china_province_by_time(ChinaTotal, ChinaProvince, province_name, start_t
     df = pd.concat([df, df_confirm_forecast, df_heal_forecast, df_dead_forecast, df_now_confirm_forecast,
                     df_confirm_compare_forecast], axis=1)
 
-    return df.to_json(orient='records')
+    res = {
+        "data": json.loads(df.to_json(orient='records')),
+        "src_png": [confirm_src, heal_src, dead_src, now_confirm_src, confirm_compare_src]
+    }
+    return json.dumps(res, ensure_ascii=False)
 
 
 def get_forecast(xy_df, k_name, feature_nums):
@@ -409,14 +413,14 @@ def get_forecast(xy_df, k_name, feature_nums):
     """
     k_a = k_name + "_a"
     k_b = k_name + "_b"
-    a, b, x, y_prod = forecast(pd.DataFrame(xy_df[['x', 'y']]), feature_nums)
+    a, b, x, y_prod, src_dict = forecast(pd.DataFrame(xy_df[['x', 'y']]), feature_nums, k_name)
     print('y = ' + str(a) + ' + ' + str(b) + 'x')
 
     return pd.DataFrame(list(map(lambda v: {
         k_name: v,
         k_a: a,
         k_b: b
-    }, y_prod)))
+    }, y_prod))), src_dict
 
 
 def get_forecast_support_time(ChinaTotal):

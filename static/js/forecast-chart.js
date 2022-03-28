@@ -686,7 +686,7 @@ function forecastButtonClick() {
             var confirmCompareForecast = []
             var date = []
 
-            data.forEach(item => {
+            data.data.forEach(item => {
                 confirmHistory.push(item.confirm)
                 confirmForecast.push(item.confirm_forecast)
                 healHistory.push(item.heal)
@@ -735,7 +735,7 @@ function forecastButtonClick() {
 
 
             // 左下table常数、系数显示
-            var item = data[0]
+            var item = data.data[0]
             var linearRegressions = [
                 {
                     "name": "预测累计确诊",
@@ -770,6 +770,10 @@ function forecastButtonClick() {
                 item = "<tr><td><h4>" + lr.name + "</h4></td><td>" + lr.a + "</td><td>" + lr.b + "</td></tr>";
                 $('#forecastLinearRegression').append(item);
             })
+
+            // 图片
+            $('#forecastBar1').html("")
+            $('#forecastBar1').append("<img src=\"" + data.src_png[0].src + "\"/>")
         }
     })
 
