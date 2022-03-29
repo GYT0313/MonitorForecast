@@ -85,6 +85,7 @@
     })
 })();
 
+var src_png_list;
 
 // 点击确认按钮后查询该省各城市数据（地图）、该省每日数据趋势（折线图）、该省累计确诊前五的数据（丁格尔玫瑰图）
 function forecastButtonClick() {
@@ -763,6 +764,8 @@ function forecastButtonClick() {
                     "b": item.confirm_compare_forecast_b
                 },
             ]
+
+            // 左下回归方程系数
             $('#forecastLinearRegression').html("")
             tableHead = "<tr><th id='tableHeadLine' style='background-color: rgba(255, 145, 0, 0.7);'><span style=\"float:left;\">类型</span><span style=\"float:right;\">名称</span></th><th>常数a</th><th>系数b</th></tr>"
             $('#forecastLinearRegression').append(tableHead);
@@ -771,10 +774,32 @@ function forecastButtonClick() {
                 $('#forecastLinearRegression').append(item);
             })
 
+            // 下拉框选择图片
+            src_png_list = data.src_png
+            $("#forecastPng").empty()
+            data.src_png.forEach(src_dict => {
+                var option = $(`<option value="${src_dict.src_name}">${src_dict.src_name}</option>`)
+                $("#forecastPng").append(option)
+            })
+
             // 图片
             $('#forecastBar1').html("")
             $('#forecastBar1').append("<img src=\"" + data.src_png[0].src + "\"/>")
         }
     })
 
+}
+
+
+// 选择图片下拉框
+function forecastPngButtonClick() {
+    // 获取下拉框
+    var forecastPng = document.getElementById("forecastPng")
+    var name_png = forecastPng.options[forecastPng.selectedIndex].text
+    src_png_list.forEach(src_dict => {
+        if (src_dict.src_name === name_png) {
+            $('#forecastBar1').html("")
+            $('#forecastBar1').append("<img src=\"" + src_dict.src + "\"/>")
+        }
+    })
 }

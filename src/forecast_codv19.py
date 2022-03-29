@@ -90,7 +90,7 @@ def graphic_drawing(x_original, y_original, x_test_list, y_pred_list, feature_nu
     """
     plt = get_plt()
     # 大小、中文设置
-    plt.figure(figsize=(7.5, 4), dpi=70)
+    plt.figure(figsize=(7, 4), dpi=70)
     plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
 
     # 历史数据散点
