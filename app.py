@@ -238,6 +238,15 @@ def handler_exception(err):
     return str(err)
 
 
+@app.route('/calculate/now_confirm_compare', methods=['GET'])
+def calculate_now_confirm_compare():
+    """
+    计算现有较昨日确诊
+    :return:
+    """
+    return db_request_service.calculate_now_confirm_compare(ChinaCompareDaily)
+
+
 # #############################################################################################
 
 class Jobs(object):

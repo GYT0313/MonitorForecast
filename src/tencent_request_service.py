@@ -19,6 +19,9 @@ china_url = 'https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5'
 # 省份历史数据
 province_history_url = 'https://api.inews.qq.com/newsqa/v1/query/pubished/daily/list?province=xxx'
 
+# TODO: 国内数据每日变化使用此URL
+china_day_list = 'https://api.inews.qq.com/newsqa/v1/query/inner/publish/modules/list?modules=chinaDayList,chinaDayAddList,nowConfirmStatis,provinceCompare'
+
 def request_global_data_url():
     """
     全球疫情数据

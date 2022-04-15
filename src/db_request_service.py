@@ -440,3 +440,16 @@ def get_forecast_support_time(ChinaTotal):
         },
         ensure_ascii=False
     )
+
+
+def calculate_now_confirm_compare(ChinaCompareDaily):
+    """
+
+    :param ChinaCompareDaily:
+    :return:
+    """
+    list_china_compare_daily = list(map(lambda x: x.__self_dict__(), ChinaCompareDaily.query.all()))
+    pd_china_compare_daily = pd.DataFrame(list_china_compare_daily)
+    pd_china_compare_daily['calculate_now_confirm_compare'] = list(
+        (map(lambda x: x['confirm_compare'] - x['heal_compare'] - x['dead_compare'], list_china_compare_daily)))
+    return pd_china_compare_daily.to_json(orient='records')
