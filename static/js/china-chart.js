@@ -1,3 +1,5 @@
+// 中国省份页面js
+// 刷新
 function chinaClick() {
     // 中间累计数据
     (function () {

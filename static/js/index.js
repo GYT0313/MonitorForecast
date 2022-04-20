@@ -1,3 +1,10 @@
+// 全球页面js
+
+// 刷新
+function globalClick() {
+    window.location.reload()
+}
+
 // 中间累计数据
 (function () {
     $.ajax({

@@ -1,3 +1,10 @@
+// 预测页面js
+
+// 刷新
+function forecastClick() {
+    forecastButtonClick()
+}
+
 // 省-城市二级联动
 (function () {
     $.ajax({
