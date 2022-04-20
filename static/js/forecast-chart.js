@@ -746,27 +746,27 @@ function forecastButtonClick() {
             var item = data.data[0]
             var linearRegressions = [
                 {
-                    "name": "预测累计确诊",
+                    "name": "累计确诊",
                     "a": item.confirm_forecast_a,
                     "b": item.confirm_forecast_b
                 },
                 {
-                    "name": "预测累计治愈",
+                    "name": "累计治愈",
                     "a": item.heal_forecast_a,
                     "b": item.heal_forecast_b
                 },
                 {
-                    "name": "预测累计死亡",
+                    "name": "累计死亡",
                     "a": item.dead_forecast_a,
                     "b": item.dead_forecast_b
                 },
                 {
-                    "name": "预测现有确诊",
+                    "name": "现有确诊",
                     "a": item.now_confirm_forecast_a,
                     "b": item.now_confirm_forecast_b
                 },
                 {
-                    "name": "预测较昨日确诊",
+                    "name": "较昨日确诊",
                     "a": item.confirm_compare_forecast_a,
                     "b": item.confirm_compare_forecast_b
                 },
