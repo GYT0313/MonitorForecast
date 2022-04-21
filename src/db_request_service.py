@@ -21,14 +21,14 @@ def get_most_new_data_by_last_update_time(ModelClassType):
     return ModelClassType.query.order_by(desc(ModelClassType.last_update_time)).limit(1).all()[0]
 
 
-def get_most_new_data_by_last_update_time_and_name(ModelClassType, name):
-    """
-    根据last_update_time 和name返回最新的数据: 仅限有last_update_time 和name的模型类
-    :return:
-    """
-    return \
-        ModelClassType.query.filter(ModelClassType.name == name).order_by(desc(ModelClassType.last_update_time)).limit(
-            1).all()[0]
+# def get_most_new_data_by_last_update_time_and_name(ModelClassType, name):
+#     """
+#     根据last_update_time 和name返回最新的数据: 仅限有last_update_time 和name的模型类
+#     :return:
+#     """
+#     return \
+#         ModelClassType.query.filter(ModelClassType.name == name).order_by(desc(ModelClassType.last_update_time)).limit(
+#             1).all()[0]
 
 
 def get_province_data_by_name_and_china_total_id(ChinaProvince, province_name, china_total_id):

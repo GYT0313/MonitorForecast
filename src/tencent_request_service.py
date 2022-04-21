@@ -213,6 +213,7 @@ def save_china(db, ChinaTotal, ChinaCompareDaily, ChinaProvince, ChinaCity):
     国内疫情数据保存到MySQL
     :return:
     """
+    # 现在接口数据返回不完全, josn加载错误, 无法保存国内的数据
     response = json.loads(request_china_url())
 
     # 响应成功

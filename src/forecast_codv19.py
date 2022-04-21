@@ -51,7 +51,7 @@ def forecast(df, feature_nums, forecast_name):
     # 使用历史数据、预测数据绘制图形
     src = graphic_drawing(x, y, x_test_list, y_pred_list, feature_nums, forecast_name)
 
-    # 分别是常熟a（保留两位小数）、系数b（保留两位小数）、横坐标x列表、预测值y列表（向下取整）
+    # 分别是 1-常熟a（保留两位小数）、2-系数b（保留两位小数）、3-横坐标x列表、4-预测值y列表（向下取整）、5-预测函数图片
     return round(model.intercept_[0], 2), \
            round(model.coef_[0][0], 2), \
            list(map(lambda v: v[0], x_test_list)), \
