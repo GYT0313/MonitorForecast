@@ -15,8 +15,10 @@ function globalClick() {
     }).then((data) => {
         let sum = data.confirm
         let cureSum = data.heal
+        let dead = data.dead
         $(".no-hd-global li:first").text(sum)
         $(".no-hd-global li:nth-child(2)").text(cureSum)
+        $(".no-hd-global li:nth-child(3)").text(dead)
     })
 })();
 
