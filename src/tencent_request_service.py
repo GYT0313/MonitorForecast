@@ -48,22 +48,6 @@ def request_china_url():
     return request(china_url).text
 
 
-def china_epidemic_situation():
-    pass
-
-
-def china_forecast():
-    pass
-
-
-def cumulative_distribution_by_continent():
-    """
-    各洲累计分布确诊
-    :return:
-    """
-    pass
-
-
 # ##############################################全球数据#################################################################
 
 def save_global_data(db, GlobalWomWorld, GlobalWomAboard, GlobalDaily):
